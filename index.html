@@ -266,8 +266,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F2F5;color:var(--text
 const KEY = 'yram_creanciers_v2';
 const DEFAULTS = [
   {id:'prudence', nom:'Prudence Créole',      addr:'32 Rue Alexis de Villeneuve, 97400 Saint-Denis'},
-  {id:'veyland',  nom:'Cabinet Veyland',       addr:'97400 Saint-Denis'},
-  {id:'bourbon',  nom:'Bourbon Développement', addr:'97400 Saint-Denis'},
+  {id:'edf', nom:'EDF',      addr:'8 av Georges Brassens CS 62009 97744 Saint-Denis Cedex 9'},
+  {id:'dioneo', nom:'DIONEO',      addr:'53, rue Saint Anne - CS 61011 97743 Saint-Denis Cedex 9'},
+  {id:'runeo', nom:'RUNEO',      addr:'3, rue Sainte-Anne CS 61011 97743 Saint-Denis Cedex 9'},
+  {id:'dioneo', nom:'DIONEO',      addr:'53, rue Saint Anne - CS 61011 97743 Saint-Denis Cedex 9'},
 ];
 
 function getList(){ try{ return JSON.parse(localStorage.getItem(KEY))||DEFAULTS; }catch{ return DEFAULTS; } }
