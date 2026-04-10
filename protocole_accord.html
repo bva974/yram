@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YRAM Recouvrement — Protocole d'Accord</title>
+<style>
+:root{--navy:#1A1A1A;--blue:#2E5FA3;--blue-light:#D6E4F7;--blue-mid:#185FA5;--red:#D4003F;--gray:#6B7280;--gray-light:#F4F6FA;--border:#E2E8F0;--text:#1A1A2E;--muted:#6B7280;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F2F5;color:var(--text);font-size:14px;}
+.topbar{background:var(--navy);color:#fff;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:56px;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.topbar-brand{font-size:15px;font-weight:700;letter-spacing:.08em;}
+.topbar-sub{font-size:11px;color:#A8C0E8;}
+.red-bar{height:4px;background:var(--red);}
+.btn-manage{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .15s;}
+.btn-manage:hover{background:rgba(255,255,255,.2);}
+.app{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 60px);}
+.sidebar{background:#fff;border-right:1px solid var(--border);padding:1.25rem 1rem;display:flex;flex-direction:column;gap:1rem;overflow-y:auto;max-height:calc(100vh - 60px);}
+.sidebar h2{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem;}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-size:11px;color:var(--muted);font-weight:600;}
+.field input,.field select{border:1px solid var(--border);border-radius:6px;padding:6px 9px;font-size:12px;color:var(--text);background:#fff;outline:none;width:100%;transition:border-color .15s;}
+.field input:focus,.field select:focus{border-color:var(--blue-mid);}
+.sep{border:none;border-top:1px solid var(--border);}
+.btn-print{background:var(--blue-mid);color:#fff;border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%;transition:background .15s;}
+.btn-print:hover{background:#0C447C;}
+.main{padding:1.5rem;overflow-y:auto;max-height:calc(100vh - 60px);}
+
+/* OVERLAY */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;}
+.overlay.open{display:flex;}
+.modal{background:#fff;border-radius:12px;width:540px;max-width:94vw;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal-head{background:var(--navy);color:#fff;padding:1.1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-head h3{font-size:14px;font-weight:700;letter-spacing:.04em;}
+.modal-close{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;opacity:.7;padding:0 2px;line-height:1;}
+.modal-close:hover{opacity:1;}
+.modal-body{padding:1.25rem 1.5rem;overflow-y:auto;flex:1;}
+.modal-foot{padding:.875rem 1.5rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;}
+.cr-list{display:flex;flex-direction:column;gap:7px;margin-bottom:1.25rem;}
+.cr-item{display:flex;align-items:center;gap:10px;background:var(--gray-light);border:1px solid var(--border);border-radius:8px;padding:.7rem 1rem;}
+.cr-info{flex:1;min-width:0;}
+.cr-nom{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cr-addr{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+.btn-del{flex-shrink:0;background:none;border:1px solid #fca5a5;color:#dc2626;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s;}
+.btn-del:hover{background:#fef2f2;}
+.btn-edit{flex-shrink:0;background:none;border:1px solid #93C5FD;color:#1D4ED8;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s;margin-right:4px;}
+.btn-edit:hover{background:#EFF6FF;}
+.btn-save{flex-shrink:0;background:#185FA5;border:none;color:#fff;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;margin-right:4px;}
+.btn-save:hover{background:#0C447C;}
+.cr-edit-row{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;}
+.cr-edit-row input{border:1px solid #93C5FD;border-radius:5px;padding:7px 10px;font-size:13px;width:100%;outline:none;color:var(--text);}
+.cr-edit-row input:focus{border-color:var(--blue-mid);}
+.cr-item-editing{flex-wrap:wrap;align-items:flex-start;gap:8px;padding:.875rem 1rem;}
+.add-box{border:1px solid var(--border);border-radius:8px;padding:1rem 1.1rem;background:#f8faff;}
+.add-box-title{font-size:11px;font-weight:700;color:var(--blue-mid);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;}
+.add-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.add-box input{border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;width:100%;outline:none;color:var(--text);background:#fff;}
+.add-box input:focus{border-color:var(--blue-mid);}
+.btn-add{background:var(--navy);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;}
+.btn-add:hover{background:#2a2a2a;}
+.btn-cancel{background:#fff;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:8px 16px;font-size:13px;cursor:pointer;}
+.empty-cr{text-align:center;padding:1.5rem;color:var(--muted);font-size:13px;}
+
+/* SUMMARY */
+.summary-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem;max-width:820px;margin-left:auto;margin-right:auto;}
+.sum-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;}
+.sum-label{font-size:10px;color:var(--muted);margin-bottom:3px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
+.sum-val{font-size:20px;font-weight:700;color:var(--text);}
+.sum-val.blue{color:var(--blue-mid);}
+.sum-val.red{color:var(--red);}
+
+/* PREVIEW */
+.preview-wrap{background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;max-width:820px;margin:0 auto;}
+.empty-state{text-align:center;padding:5rem 2rem;color:var(--muted);}
+
+/* DOCUMENT */
+.doc{font-family:'Segoe UI',Arial,sans-serif;color:#1A1A2E;}
+.doc-header{background:var(--navy);color:#fff;padding:1.75rem 2.5rem 1.5rem;}
+.doc-brand{font-size:10px;font-weight:700;letter-spacing:.14em;color:#A8C0E8;text-transform:uppercase;margin-bottom:4px;}
+.doc-title{font-size:26px;font-weight:700;letter-spacing:.04em;}
+.doc-sub{font-size:13px;color:#A8C0E8;font-style:italic;margin-top:4px;}
+.doc-redbar{height:4px;background:var(--red);}
+.doc-body{padding:1.75rem 2.5rem;}
+.parties-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+.party-card{background:var(--gray-light);border-radius:6px;padding:.875rem 1rem;border-left:3px solid var(--blue);}
+.party-card.debtor{border-left-color:var(--red);}
+.party-role{font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;}
+.party-card.debtor .party-role{color:var(--red);}
+.party-name{font-size:13px;font-weight:700;}
+.party-addr{font-size:11px;color:var(--muted);margin-top:2px;}
+.party-rep{font-size:10px;color:var(--muted);font-style:italic;margin-top:3px;}
+.party-mandataire{margin-top:8px;padding-top:8px;border-top:1px dashed #d0d8e8;}
+.party-mandataire-label{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;}
+.party-mandataire-name{font-size:12px;font-weight:700;color:var(--blue-mid);}
+.party-mandataire-addr{font-size:10px;color:var(--muted);margin-top:1px;}
+.section{margin-bottom:1rem;}
+.section-header{display:flex;align-items:baseline;gap:7px;border-left:3px solid var(--red);padding-left:10px;margin-bottom:.45rem;}
+.section-num{font-size:12px;font-weight:700;color:var(--red);}
+.section-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.05em;}
+.section-body{font-size:12px;line-height:1.7;padding-left:13px;}
+.section-body p{margin-bottom:.3rem;}
+.section-body ul{padding-left:1.2rem;}
+.section-body ul li{margin-bottom:2px;}
+.highlight{font-weight:700;color:var(--navy);}
+.field-val{font-weight:700;color:var(--blue-mid);}
+.ech-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:.4rem;}
+.ech-table thead tr{background:var(--navy);color:#fff;}
+.ech-table th{padding:7px 9px;text-align:left;font-weight:700;font-size:10px;letter-spacing:.04em;}
+.ech-table td{padding:6px 9px;border-bottom:1px solid var(--border);}
+.ech-table tr:nth-child(even) td{background:var(--gray-light);}
+.ech-table tr.total-row td{background:var(--blue-light);font-weight:700;color:var(--navy);border-top:2px solid var(--blue);}
+.ech-table .n-cell{color:var(--blue-mid);font-weight:700;}
+.ech-table .amt-last{color:var(--red);font-weight:700;}
+.ech-note{font-size:10px;color:var(--muted);font-style:italic;margin-top:5px;padding-left:13px;}
+.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);}
+.sig-box{text-align:center;}
+.sig-role{font-size:11px;font-weight:700;color:var(--navy);margin-bottom:2px;}
+.sig-name{font-size:11px;color:var(--muted);margin-bottom:1px;}
+.sig-note{font-size:10px;color:var(--muted);font-style:italic;margin-bottom:.875rem;}
+.sig-line{border-bottom:1.5px solid var(--blue);margin:0 1rem;}
+.sig-box.debtor .sig-line{border-bottom-color:var(--red);}
+.sig-caption{font-size:10px;color:var(--muted);margin-top:4px;font-style:italic;}
+.doc-footer{background:var(--gray-light);padding:.625rem 2.5rem;font-size:10px;color:var(--muted);display:flex;justify-content:space-between;border-top:1px solid var(--border);}
+
+@media print{
+  body{background:#fff;}
+  .topbar,.red-bar,.sidebar,.summary-row,.overlay{display:none!important;}
+  .app{display:block;}
+  .main{padding:0;max-height:none;}
+  .preview-wrap{border:none;border-radius:0;max-width:100%;}
+  .doc-body{padding:1.5rem 2rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div>
+      <div class="topbar-brand">YRAM RECOUVREMENT</div>
+      <div class="topbar-sub">Générateur de protocole d'accord</div>
+    </div>
+  </div>
+  <button class="btn-manage" onclick="openManager()">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+      <circle cx="8" cy="4.5" r="2.2"/><path d="M2.5 14c0-3.04 2.46-5.5 5.5-5.5s5.5 2.46 5.5 5.5"/>
+      <line x1="12.5" y1="1.5" x2="12.5" y2="5.5"/><line x1="10.5" y1="3.5" x2="14.5" y2="3.5"/>
+    </svg>
+    Gérer les créanciers
+  </button>
+</div>
+<div class="red-bar"></div>
+
+<!-- OVERLAY MANAGER -->
+<div class="overlay" id="overlay" onclick="bgClose(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Gérer les créanciers</h3>
+      <button class="modal-close" onclick="closeManager()">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="cr-list" id="cr-list"></div>
+      <div class="add-box">
+        <div class="add-box-title">Ajouter un créancier</div>
+        <div class="add-row">
+          <input id="new-nom" placeholder="Nom du créancier" onkeydown="if(event.key==='Enter')addCr()"/>
+          <input id="new-addr" placeholder="Adresse postale complète" onkeydown="if(event.key==='Enter')addCr()"/>
+        </div>
+        <button class="btn-add" onclick="addCr()">Ajouter</button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeManager()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+  <div class="sidebar">
+    <div>
+      <h2>Créancier</h2>
+      <div class="field">
+        <select id="sel-cr" onchange="pickCr()"><option value="">— Choisir —</option></select>
+      </div>
+      <input type="hidden" id="cr-nom">
+      <input type="hidden" id="cr-addr">
+
+    </div>
+    <hr class="sep">
+    <div>
+      <h2>Débiteur</h2>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div class="field"><label>Nom complet</label><input id="db-nom" placeholder="ex: Balzan Alexandra" oninput="render()"></div>
+        <div class="field"><label>Adresse</label><input id="db-addr" placeholder="ex: 1 Rue de la Plage, 97434 St-Gilles" oninput="render()"></div>
+      </div>
+    </div>
+    <hr class="sep">
+    <div>
+      <h2>Créance</h2>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div class="field"><label>Montant total dû (€)</label><input id="montant" type="number" step="0.01" min="0" placeholder="ex: 740.25" oninput="render()"></div>
+        <div class="field">
+          <label>Premier paiement (€) <span style="font-weight:400;color:var(--muted);font-size:10px">— optionnel</span></label>
+          <input id="premier-paiement" type="number" step="0.01" min="0" placeholder="ex: 100.00" oninput="render()">
+          <span id="hint-solde" style="font-size:11px;color:#185FA5;font-weight:600;min-height:16px;"></span>
+        </div>
+        <input type="hidden" id="objet">
+        <div class="field"><label>Référence dossier</label><input id="ref" placeholder="ex: SP-1619-02/2023" oninput="render()"></div>
+      </div>
+    </div>
+    <hr class="sep">
+    <div>
+      <h2>Échéancier</h2>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div class="field"><label>Date 1ère échéance</label><input id="start-date" type="date" oninput="render()"></div>
+        <div class="field"><label>Mode de paiement</label>
+          <select id="mode" onchange="render()">
+            <option>Carte bancaire</option>
+            <option>Virement</option>
+            <option>Chèque</option>
+            <option>Espèces</option>
+            <option>Prélèvement CB</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:2px;">
+          <button class="toggle-btn active" id="btn-mode-mens" onclick="setEchMode('mens')" style="flex:1;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;background:#fff;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;">Par mensualité</button>
+          <button class="toggle-btn" id="btn-mode-nb" onclick="setEchMode('nb')" style="flex:1;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;background:#fff;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;">Par nb d'échéances</button>
+        </div>
+        <div class="field" id="field-mens">
+          <label>Mensualité (€)</label>
+          <input id="mensualite" type="number" step="0.01" min="0" placeholder="ex: 125" oninput="render()">
+          <span id="hint-mens" style="font-size:11px;color:#185FA5;font-weight:600;min-height:16px;"></span>
+        </div>
+        <div class="field" id="field-nb" style="display:none">
+          <label>Nombre d'échéances</label>
+          <input id="nb-echeances" type="number" step="1" min="1" max="240" placeholder="ex: 6" disabled oninput="render()">
+          <span id="hint-nb" style="font-size:11px;color:#185FA5;font-weight:600;min-height:16px;"></span>
+        </div>
+      </div>
+    </div>
+    <hr class="sep">
+    <button class="btn-print" onclick="window.print()">Imprimer / Exporter PDF</button>
+  </div>
+
+  <div class="main">
+    <div class="summary-row" id="sum-row" style="display:none">
+      <div class="sum-card"><div class="sum-label">Montant total</div><div class="sum-val red" id="s-mont">—</div></div>
+      <div class="sum-card"><div class="sum-label">Nb d'échéances</div><div class="sum-val blue" id="s-nb">—</div></div>
+      <div class="sum-card"><div class="sum-label">Dernière échéance</div><div class="sum-val" id="s-fin">—</div></div>
+    </div>
+    <div class="preview-wrap" id="preview">
+      <div class="empty-state">
+        <svg style="width:44px;height:44px;margin:0 auto 1rem;display:block;opacity:.2" viewBox="0 0 48 48" fill="none" stroke="#888" stroke-width="2">
+          <rect x="8" y="4" width="32" height="40" rx="3"/><line x1="14" y1="14" x2="34" y2="14"/>
+          <line x1="14" y1="20" x2="34" y2="20"/><line x1="14" y1="26" x2="28" y2="26"/>
+        </svg>
+        <div style="font-size:15px;font-weight:600;color:#555;margin-bottom:6px">Renseignez le formulaire</div>
+        <div style="font-size:13px;color:#aaa">Le protocole d'accord s'affichera ici en temps réel.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY = 'yram_creanciers_v2';
+const DEFAULTS = [
+  {id:'prudence', nom:'Prudence Créole',      addr:'32 Rue Alexis de Villeneuve, 97400 Saint-Denis'},
+  {id:'veyland',  nom:'Cabinet Veyland',       addr:'97400 Saint-Denis'},
+  {id:'bourbon',  nom:'Bourbon Développement', addr:'97400 Saint-Denis'},
+];
+
+function getList(){ try{ return JSON.parse(localStorage.getItem(KEY))||DEFAULTS; }catch{ return DEFAULTS; } }
+function setList(l){ localStorage.setItem(KEY, JSON.stringify(l)); }
+
+function rebuildSelect(){
+  const list=getList(), sel=document.getElementById('sel-cr'), cur=sel.value;
+  sel.innerHTML='<option value="">— Choisir —</option>';
+  list.forEach(c=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.nom; sel.appendChild(o); });
+  if(cur && list.find(c=>c.id===cur)) sel.value=cur;
+}
+
+function pickCr(){
+  const c=getList().find(x=>x.id===document.getElementById('sel-cr').value);
+  if(c){ document.getElementById('cr-nom').value=c.nom; document.getElementById('cr-addr').value=c.addr; }
+  render();
+}
+
+function renderModalList(){
+  const list=getList(), el=document.getElementById('cr-list');
+  if(!list.length){ el.innerHTML='<div class="empty-cr">Aucun créancier enregistré.</div>'; return; }
+  el.innerHTML=list.map(c=>`
+    <div class="cr-item" id="item-${c.id}">
+      <div class="cr-info"><div class="cr-nom">${esc(c.nom)}</div><div class="cr-addr">${esc(c.addr)}</div></div>
+      <button class="btn-edit" onclick="editCr('${c.id}')">Modifier</button>
+      <button class="btn-del" onclick="delCr('${c.id}')">Supprimer</button>
+    </div>`).join('');
+}
+
+function editCr(id){
+  const c=getList().find(x=>x.id===id);
+  if(!c) return;
+  const item=document.getElementById('item-'+id);
+  item.classList.add('cr-item-editing');
+  item.innerHTML=`
+    <div class="cr-edit-row" style="width:100%">
+      <input id="edit-nom-${id}" value="${esc(c.nom)}" placeholder="Nom du créancier"/>
+      <input id="edit-addr-${id}" value="${esc(c.addr)}" placeholder="Adresse postale complète"/>
+    </div>
+    <div style="display:flex;gap:6px;width:100%;justify-content:flex-end;margin-top:2px;">
+      <button class="btn-del" onclick="renderModalList()">Annuler</button>
+      <button class="btn-save" onclick="saveCr('${id}')">Enregistrer</button>
+    </div>`;
+  document.getElementById('edit-nom-'+id).focus();
+}
+
+function saveCr(id){
+  const nom=document.getElementById('edit-nom-'+id).value.trim();
+  const addr=document.getElementById('edit-addr-'+id).value.trim();
+  if(!nom){ document.getElementById('edit-nom-'+id).style.borderColor='#dc2626'; return; }
+  const list=getList().map(c=>c.id===id ? {...c, nom, addr} : c);
+  setList(list);
+  rebuildSelect();
+  // Update sidebar if this creancier is currently selected
+  if(document.getElementById('sel-cr').value===id){
+    document.getElementById('cr-nom').value=nom;
+    document.getElementById('cr-addr').value=addr;
+    render();
+  }
+  renderModalList();
+}
+
+function addCr(){
+  const nom=document.getElementById('new-nom').value.trim();
+  const addr=document.getElementById('new-addr').value.trim();
+  if(!nom){ document.getElementById('new-nom').style.borderColor='#dc2626'; setTimeout(()=>document.getElementById('new-nom').style.borderColor='',1500); return; }
+  const list=getList();
+  list.push({id:'cr_'+Date.now(), nom, addr});
+  setList(list);
+  document.getElementById('new-nom').value='';
+  document.getElementById('new-addr').value='';
+  renderModalList(); rebuildSelect();
+}
+
+function delCr(id){
+  setList(getList().filter(c=>c.id!==id));
+  renderModalList(); rebuildSelect();
+  if(document.getElementById('sel-cr').value===id){
+    document.getElementById('cr-nom').value='';
+    document.getElementById('cr-addr').value='';
+    render();
+  }
+}
+
+function openManager(){ renderModalList(); document.getElementById('overlay').classList.add('open'); }
+function closeManager(){ document.getElementById('overlay').classList.remove('open'); }
+function bgClose(e){ if(e.target===document.getElementById('overlay')) closeManager(); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeManager(); });
+
+let echMode = 'mens';
+
+function setEchMode(mode) {
+  echMode = mode;
+  const isMens = mode === 'mens';
+  document.getElementById('btn-mode-mens').style.cssText += isMens
+    ? ';border-color:#185FA5;background:#EEF4FC;color:#185FA5'
+    : ';border-color:#E2E8F0;background:#fff;color:#6B7280';
+  document.getElementById('btn-mode-nb').style.cssText += !isMens
+    ? ';border-color:#185FA5;background:#EEF4FC;color:#185FA5'
+    : ';border-color:#E2E8F0;background:#fff;color:#6B7280';
+  document.getElementById('field-mens').style.display = isMens ? '' : 'none';
+  document.getElementById('field-nb').style.display   = isMens ? 'none' : '';
+  document.getElementById('mensualite').disabled = !isMens;
+  document.getElementById('nb-echeances').disabled = isMens;
+  document.getElementById('hint-mens').textContent = '';
+  document.getElementById('hint-nb').textContent = '';
+  render();
+}
+
+function getMensualite(montant) {
+  if(!montant||montant<=0) return null;
+  if (echMode === 'mens') {
+    const raw = parseFloat(document.getElementById('mensualite').value);
+    if (!raw || raw <= 0 || raw > montant) return null;
+    const m = Math.ceil(raw);
+    const nb = Math.ceil(montant / m);
+    document.getElementById('hint-mens').textContent = `→ ${nb} échéance${nb>1?'s':''}`;
+    return m;
+  } else {
+    const nb = parseInt(document.getElementById('nb-echeances').value);
+    if (!nb || nb <= 0) return null;
+    const m = Math.ceil(montant / nb);
+    document.getElementById('hint-nb').textContent = `→ ${m.toLocaleString('fr-FR')} € / mois`;
+    return m;
+  }
+}
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmt(n){ return Number.isInteger(n) ? n.toLocaleString('fr-FR')+'\u00a0€' : n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+'\u00a0€'; }
+function fmtD(d){ return d.toLocaleDateString('fr-FR'); }
+function today(){ return new Date().toISOString().slice(0,10); }
+
+function echeancier(total, mens, start, mode){
+  const rows=[]; let rem=Math.round(total*100)/100, n=1;
+  let d = (start instanceof Date) ? new Date(start) : new Date(start);
+  while(rem>0.005 && n<=120){
+    const m = rem <= mens ? rem : mens;
+    rows.push({n, date:new Date(d), montant:m, mode});
+    rem=Math.round((rem-m)*100)/100;
+    d=new Date(d.getFullYear(),d.getMonth()+1,d.getDate()); n++;
+  }
+  if(rows.length>1) rows[rows.length-1].adjusted = rows[rows.length-1].montant!==mens;
+  return rows;
+}
+
+function ph(s){ return `<span style="color:#ccc">${s}</span>`; }
+
+function render(){
+  const crNom=document.getElementById('cr-nom').value.trim();
+  const crAddr=document.getElementById('cr-addr').value.trim();
+  const dbNom=document.getElementById('db-nom').value.trim();
+  const dbAddr=document.getElementById('db-addr').value.trim();
+  const montant=parseFloat(document.getElementById('montant').value);
+  const premierPaiementRaw=parseFloat(document.getElementById('premier-paiement').value);
+  const premierPaiement=(premierPaiementRaw>0&&premierPaiementRaw<montant)?Math.round(premierPaiementRaw*100)/100:0;
+  const solde=montant>0?Math.round((montant-(premierPaiement||0))*100)/100:0;
+  // Hint solde
+  const hintSolde=document.getElementById('hint-solde');
+  if(montant>0&&premierPaiement>0){
+    hintSolde.textContent=`→ Solde à échelonner : ${fmt(solde)}`;
+  } else {
+    hintSolde.textContent='';
+  }
+  const objet = crNom ? `Facture(s) impayée(s) ${crNom}` : document.getElementById('objet').value.trim();
+  const ref=document.getElementById('ref').value.trim();
+  const mens = getMensualite(solde>0?solde:montant);
+  const start=document.getElementById('start-date').value;
+  const mode=document.getElementById('mode').value;
+  const lieu=''; const ds=''; const dsFmt='';
+
+  if(!crNom&&!dbNom&&!montant) return;
+
+  let echHTML=''; const sr=document.getElementById('sum-row');
+  if(montant>0&&mens>0&&start){
+    // Si premier paiement, on ajoute une ligne dédiée puis l'échéancier sur le solde
+    let allRows=[];
+    let totalEch=0;
+    let firstDate=new Date(start);
+    if(premierPaiement>0){
+      allRows.push({n:1, date:new Date(firstDate), montant:premierPaiement, mode, isPremier:true});
+      // Échéances suivantes à partir du mois suivant
+      let nextDate=new Date(firstDate.getFullYear(),firstDate.getMonth()+1,firstDate.getDate());
+      const echRows=echeancier(solde,mens,nextDate.toISOString().slice(0,10),mode);
+      echRows.forEach((r,i)=>{ r.n=i+2; allRows.push(r); });
+      totalEch=solde;
+    } else {
+      allRows=echeancier(montant,mens,start,mode);
+      totalEch=montant;
+    }
+    const last=allRows[allRows.length-1];
+    document.getElementById('s-mont').textContent=fmt(montant);
+    document.getElementById('s-nb').textContent=allRows.length;
+    document.getElementById('s-fin').textContent=last?fmtD(last.date):'—';
+    sr.style.display='grid';
+    const trs=allRows.map(r=>`<tr${r.isPremier?' style="background:#EEF9F0"':''}><td class="n-cell">${r.n}</td><td>${fmtD(r.date)}</td><td class="${r.adjusted?'amt-last':''}">${fmt(r.montant)}${r.isPremier?' <span style="font-size:9px;background:#16A34A;color:#fff;border-radius:3px;padding:1px 5px;vertical-align:middle;font-weight:700">1er versement</span>':''}</td><td style="color:var(--muted)">${r.mode}</td></tr>`).join('');
+    echHTML=`<table class="ech-table"><thead><tr><th>N°</th><th>Date d'échéance</th><th>Montant</th><th>Mode de paiement</th></tr></thead><tbody>${trs}<tr class="total-row"><td></td><td>TOTAL DÛ</td><td style="color:var(--red)">${fmt(montant)}</td><td></td></tr></tbody></table>`;
+    if(last&&last.adjusted) echHTML+=`<p class="ech-note">La dernière échéance est ajustée pour solder exactement le montant dû.</p>`;
+    if(premierPaiement>0) echHTML+=`<p class="ech-note" style="color:#16A34A">Premier versement de ${fmt(premierPaiement)} déduit — échéances calculées sur le solde de ${fmt(solde)}.</p>`;
+  } else {
+    sr.style.display='none';
+    echHTML=`<p style="font-size:12px;color:var(--muted);padding-left:13px">Renseignez le montant, la mensualité et la date de départ.</p>`;
+  }
+
+  document.getElementById('preview').innerHTML=`<div class="doc">
+  <div class="doc-header">
+    <div class="doc-brand">YRAM RECOUVREMENT</div>
+    <div class="doc-title">PROTOCOLE D'ACCORD</div>
+    <div class="doc-sub">Échéancier de Règlement${ref?' — Réf. '+ref:''}</div>
+  </div>
+  <div class="doc-redbar"></div>
+  <div class="doc-body">
+    <div class="parties-grid">
+      <div class="party-card">
+        <div class="party-role">Créancier</div>
+        <div class="party-name">${crNom||ph('__________________________')}</div>
+        <div class="party-addr">${crAddr||ph('__________________________')}</div>
+        <div class="party-mandataire">
+          <div class="party-mandataire-label">Représenté par</div>
+          <div class="party-mandataire-name">YRAM RECOUVREMENT</div>
+          <div class="party-mandataire-addr">4 Rue Franck Camille Cadet, 97427 L'Etang-Salé</div>
+        </div>
+      </div>
+      <div class="party-card debtor">
+        <div class="party-role">Débiteur</div>
+        <div class="party-name">${dbNom||ph('__________________________')}</div>
+        <div class="party-addr">${dbAddr||ph('__________________________')}</div>
+      </div>
+    </div>
+    <div class="section"><div class="section-header"><span class="section-num">1.</span><span class="section-title">Objet</span></div>
+      <div class="section-body"><p>Le présent protocole a pour objet de formaliser l'accord intervenu concernant le règlement d'une dette.</p></div></div>
+    <div class="section"><div class="section-header"><span class="section-num">2.</span><span class="section-title">Reconnaissance de dette</span></div>
+      <div class="section-body">
+        <p><span class="highlight">Montant reconnu dû :</span> ${montant>0?`<span class="field-val">${fmt(montant)}</span>`:ph('___________\u00a0€')}</p>
+        <p><span class="highlight">Au titre de :</span> ${objet||ph('__________________________')}</p>
+        ${ref?`<p><span class="highlight">Référence :</span> <span class="field-val">${ref}</span></p>`:''}
+        <p style="font-style:italic;color:var(--muted);margin-top:3px">Cette somme est certaine, liquide et exigible.</p>
+      </div></div>
+    <div class="section"><div class="section-header"><span class="section-num">3.</span><span class="section-title">Modalités de règlement</span></div>
+      <div class="section-body"><p style="margin-bottom:6px">Le Débiteur s'engage à régler selon l'échéancier ci-dessous :</p>${echHTML}</div></div>
+    <div class="section"><div class="section-header"><span class="section-num">4.</span><span class="section-title">Clause de défaillance</span></div>
+      <div class="section-body"><p>En cas de non-paiement d'une seule échéance à son terme :</p>
+        <ul><li>l'intégralité du solde deviendra immédiatement exigible,</li>
+        <li>le présent accord sera caduc de plein droit,</li>
+        <li>le dossier pourra être transmis en procédure judiciaire sans nouvelle mise en demeure préalable.</li></ul></div></div>
+    <div class="section"><div class="section-header"><span class="section-num">5.</span><span class="section-title">Suspension des poursuites</span></div>
+      <div class="section-body"><p>Sous réserve du respect de l'échéancier, les démarches de recouvrement sont suspendues.</p></div></div>
+    <div class="section"><div class="section-header"><span class="section-num">6.</span><span class="section-title">Absence de novation</span></div>
+      <div class="section-body"><p>Le présent accord ne constitue ni novation ni abandon de créance.</p></div></div>
+    <div class="section"><div class="section-header"><span class="section-num">7.</span><span class="section-title">Frais / Conditions particulières</span></div>
+      <div class="section-body"><p>Aucun frais ne sera appliqué en cas de respect du présent protocole d'accord. En cas de non-respect, des frais pourront être engagés dans le cadre d'une procédure judiciaire.</p></div></div>
+    <div class="section"><div class="section-header"><span class="section-num">8.</span><span class="section-title">Compétence</span></div>
+      <div class="section-body"><p>En cas de litige, compétence est attribuée aux juridictions du ressort du domicile du débiteur, sauf disposition légale contraire.</p></div></div>
+    <div class="section"><div class="section-header"><span class="section-num">9.</span><span class="section-title">Acceptation</span></div>
+      <div class="section-body"><p>Le Débiteur reconnaît accepter sans réserve le présent protocole. Le présent protocole vaut reconnaissance de dette.</p></div></div>
+  </div>
+
+</div>`;
+}
+
+rebuildSelect();
+document.getElementById('start-date').value=today();
+setEchMode('mens');
+</script>
+</body>
+</html>
