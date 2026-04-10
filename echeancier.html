@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YRAM — Échéancier</title>
+<style>
+:root{--navy:#1A1A1A;--blue:#2E5FA3;--blue-light:#D6E4F7;--blue-mid:#185FA5;--red:#D4003F;--border:#E2E8F0;--text:#1A1A2E;--muted:#6B7280;--bg:#F0F2F5;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
+.topbar{background:var(--navy);color:#fff;padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.topbar-brand{font-size:15px;font-weight:700;letter-spacing:.08em;}
+.topbar-sub{font-size:11px;color:#A8C0E8;margin-top:2px;}
+.nav{display:flex;gap:4px;}
+.nav a{color:#A8C0E8;text-decoration:none;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;transition:background .15s;}
+.nav a:hover{background:rgba(255,255,255,.1);color:#fff;}
+.nav a.active{background:rgba(255,255,255,.15);color:#fff;}
+.red-bar{height:4px;background:var(--red);}
+.page{max-width:860px;margin:2rem auto;padding:0 1.5rem;}
+
+.params{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1.5rem;}
+.params-top{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.25rem;}
+
+.field{display:flex;flex-direction:column;}
+.field-lbl{height:16px;display:flex;align-items:center;gap:5px;margin-bottom:4px;}
+.field-lbl span{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
+.field-lbl small{font-size:10px;font-weight:400;color:#B0B8C4;white-space:nowrap;}
+.field input,.field select{border:1px solid var(--border);border-radius:6px;padding:8px 11px;font-size:14px;color:var(--text);background:#fff;outline:none;width:100%;min-width:0;height:38px;box-sizing:border-box;transition:border-color .15s;}
+.field input:focus,.field select:focus{border-color:var(--blue-mid);}
+.field input.big{font-size:14px;font-weight:700;color:var(--blue-mid);}
+.hint{font-size:11px;color:var(--blue-mid);font-weight:600;height:16px;margin-top:4px;overflow:hidden;}
+
+.mode-sep{border-top:1px solid var(--border);padding-top:1.25rem;}
+.mode-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem;}
+.toggle-row{display:flex;gap:8px;margin-bottom:.875rem;}
+.tbtn{flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;background:#fff;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;}
+.tbtn.on{border-color:var(--blue-mid);background:#EEF4FC;color:var(--blue-mid);}
+.inputs-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.inactive input{background:#F8F9FA;color:#bbb;cursor:not-allowed;}
+
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem;}
+.sum-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:.875rem 1rem;}
+.sum-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+.sum-val{font-size:20px;font-weight:700;color:var(--text);}
+.sum-val.blue{color:var(--blue-mid);}
+.sum-val.red{color:var(--red);}
+
+.table-card{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1.5rem;}
+.table-toolbar{padding:.875rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.table-title{font-size:13px;font-weight:700;color:var(--text);}
+.btn-print{background:var(--blue-mid);color:#fff;border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s;}
+.btn-print:hover{background:#0C447C;}
+
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:var(--navy);color:#fff;}
+th{padding:9px 12px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.05em;}
+td{padding:9px 12px;border-bottom:1px solid var(--border);}
+tr:last-child td{border-bottom:none;}
+tr:nth-child(even) td{background:#FAFBFD;}
+tr.total-row td{background:var(--blue-light);font-weight:700;color:var(--navy);border-top:2px solid var(--blue);}
+.n-cell{color:var(--blue-mid);font-weight:700;}
+.amt-adjusted{color:var(--red);font-weight:700;}
+.empty{text-align:center;padding:3rem;color:var(--muted);font-size:13px;}
+.note{font-size:11px;color:var(--muted);font-style:italic;padding:.6rem 1.25rem .75rem;}
+
+@media print{
+  .topbar,.red-bar,.params,.summary,.btn-print{display:none!important;}
+  body{background:#fff;}
+  .page{margin:0;padding:0;max-width:100%;}
+  .table-card{border:none;border-radius:0;}
+  .table-toolbar{border-bottom:1px solid #ccc;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-brand">YRAM RECOUVREMENT</div>
+    <div class="topbar-sub">Gestionnaire d'échéancier</div>
+  </div>
+  <nav class="nav">
+    <a href="index.html">Accueil</a>
+    <a href="protocole.html">Protocole d'accord</a>
+    <a href="echeancier.html" class="active">Échéancier</a>
+  </nav>
+</div>
+<div class="red-bar"></div>
+
+<div class="page">
+
+  <div class="params">
+    <div class="params-top">
+
+      <div class="field">
+        <div class="field-lbl"><span>Montant total dû (€)</span></div>
+        <input id="montant" type="number" step="0.01" min="0" placeholder="ex : 1 200,00" class="big" oninput="generate()">
+        <div class="hint"></div>
+      </div>
+
+      <div class="field">
+        <div class="field-lbl"><span>Premier paiement (€)</span><small>— optionnel</small></div>
+        <input id="premier" type="number" step="0.01" min="0" placeholder="ex : 200,00" oninput="generate()">
+        <div class="hint" id="hint-solde"></div>
+      </div>
+
+      <div class="field">
+        <div class="field-lbl"><span>1ère échéance</span></div>
+        <input id="start" type="date" oninput="generate()">
+        <div class="hint"></div>
+      </div>
+
+      <div class="field">
+        <div class="field-lbl"><span>Mode de paiement</span></div>
+        <select id="mode" onchange="generate()">
+          <option>Carte bancaire</option>
+          <option>Virement</option>
+          <option>Chèque</option>
+          <option>Espèces</option>
+          <option>Prélèvement CB</option>
+        </select>
+        <div class="hint"></div>
+      </div>
+
+    </div>
+
+    <div class="mode-sep">
+      <div class="mode-label">Définir les échéances par</div>
+      <div class="toggle-row">
+        <button class="tbtn on" id="btn-mens" onclick="setMode('mens')">Montant de la mensualité</button>
+        <button class="tbtn"    id="btn-nb"   onclick="setMode('nb')">Nombre d'échéances</button>
+      </div>
+      <div class="inputs-row">
+        <div class="field" id="block-mens">
+          <div class="field-lbl"><span>Mensualité (€)</span></div>
+          <input id="mensualite" type="number" step="1" min="1" placeholder="ex : 100" oninput="generate()">
+          <div class="hint" id="hint-mens"></div>
+        </div>
+        <div class="field inactive" id="block-nb">
+          <div class="field-lbl"><span>Nombre d'échéances</span></div>
+          <input id="nb" type="number" step="1" min="1" max="240" placeholder="ex : 6" disabled oninput="generate()">
+          <div class="hint" id="hint-nb"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary" id="summary" style="display:none">
+    <div class="sum-card"><div class="sum-label">Montant total</div><div class="sum-val red" id="s-total">—</div></div>
+    <div class="sum-card"><div class="sum-label">Nb d'échéances</div><div class="sum-val blue" id="s-nb">—</div></div>
+    <div class="sum-card"><div class="sum-label">Dernière échéance</div><div class="sum-val" id="s-fin">—</div></div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-toolbar">
+      <span class="table-title">Échéancier</span>
+      <button class="btn-print" onclick="window.print()">Imprimer / PDF</button>
+    </div>
+    <div id="table-container">
+      <div class="empty">Renseignez les paramètres ci-dessus pour générer l'échéancier.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var currentMode = 'mens';
+
+function setMode(m) {
+  currentMode = m;
+  document.getElementById('btn-mens').className = m==='mens' ? 'tbtn on' : 'tbtn';
+  document.getElementById('btn-nb').className   = m==='nb'   ? 'tbtn on' : 'tbtn';
+  document.getElementById('block-mens').className = m==='mens' ? 'field' : 'field inactive';
+  document.getElementById('block-nb').className   = m==='nb'   ? 'field' : 'field inactive';
+  document.getElementById('mensualite').disabled = m !== 'mens';
+  document.getElementById('nb').disabled         = m !== 'nb';
+  document.getElementById('hint-mens').textContent = '';
+  document.getElementById('hint-nb').textContent   = '';
+  generate();
+}
+
+function fmt(n) {
+  if (Number.isInteger(n)) return n.toLocaleString('fr-FR') + '\u00a0€';
+  return n.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '\u00a0€';
+}
+function fmtD(d) { return d.toLocaleDateString('fr-FR'); }
+
+function generate() {
+  var montant    = parseFloat(document.getElementById('montant').value);
+  var premierRaw = parseFloat(document.getElementById('premier').value);
+  var startVal   = document.getElementById('start').value;
+  var mode       = document.getElementById('mode').value;
+
+  var clear = function() {
+    document.getElementById('table-container').innerHTML = '<div class="empty">Renseignez les paramètres ci-dessus pour générer l\'échéancier.</div>';
+    document.getElementById('summary').style.display = 'none';
+    document.getElementById('hint-solde').textContent = '';
+  };
+
+  if (!montant || !startVal || montant <= 0) { clear(); return; }
+
+  var premier = (premierRaw > 0 && premierRaw < montant) ? Math.round(premierRaw * 100) / 100 : 0;
+  var solde   = Math.round((montant - premier) * 100) / 100;
+
+  document.getElementById('hint-solde').textContent = premier > 0
+    ? '→ Solde : ' + fmt(solde)
+    : '';
+
+  var base = premier > 0 ? solde : montant;
+
+  var mensual;
+  if (currentMode === 'mens') {
+    mensual = Math.ceil(parseFloat(document.getElementById('mensualite').value));
+    if (!mensual || mensual <= 0 || mensual > base) { clear(); return; }
+    var nb = Math.ceil(base / mensual);
+    document.getElementById('hint-mens').textContent = '→ ' + nb + ' échéance' + (nb > 1 ? 's' : '');
+    document.getElementById('hint-nb').textContent = '';
+  } else {
+    var nb = parseInt(document.getElementById('nb').value);
+    if (!nb || nb <= 0) { clear(); return; }
+    mensual = Math.ceil(base / nb);
+    document.getElementById('hint-nb').textContent = '→ ' + mensual.toLocaleString('fr-FR') + '\u00a0€ / mois';
+    document.getElementById('hint-mens').textContent = '';
+  }
+
+  var rows = [];
+  var startDate = new Date(startVal);
+
+  if (premier > 0) {
+    rows.push({ n:1, date:new Date(startDate), montant:premier, mode:mode, isPremier:true });
+  }
+
+  var rem = base;
+  var n   = premier > 0 ? 2 : 1;
+  var d   = premier > 0
+    ? new Date(startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate())
+    : new Date(startDate);
+
+  while (rem > 0.005 && n <= 241) {
+    var m = rem <= mensual ? rem : mensual;
+    rows.push({ n:n, date:new Date(d), montant:m, mode:mode });
+    rem = Math.round((rem - m) * 100) / 100;
+    d = new Date(d.getFullYear(), d.getMonth()+1, d.getDate());
+    n++;
+  }
+
+  var last     = rows[rows.length-1];
+  var adjusted = rows.length > 1 && !last.isPremier && last.montant !== mensual;
+
+  document.getElementById('s-total').textContent = fmt(montant);
+  document.getElementById('s-nb').textContent    = rows.length;
+  document.getElementById('s-fin').textContent   = fmtD(last.date);
+  document.getElementById('summary').style.display = 'grid';
+
+  var trs = rows.map(function(r) {
+    var badge    = r.isPremier ? ' <span style="font-size:9px;background:#16A34A;color:#fff;border-radius:3px;padding:1px 5px;font-weight:700;vertical-align:middle">1er versement</span>' : '';
+    var rowStyle = r.isPremier ? ' style="background:#EEF9F0"' : '';
+    var isLast   = r === last;
+    return '<tr'+rowStyle+'><td class="n-cell">'+r.n+'</td><td>'+fmtD(r.date)+'</td>'+
+      '<td class="'+(isLast && adjusted ? 'amt-adjusted' : '')+'">'+fmt(r.montant)+badge+'</td>'+
+      '<td style="color:var(--muted)">'+r.mode+'</td></tr>';
+  }).join('');
+
+  var html = '<table>'+
+    '<thead><tr><th>N°</th><th>Date d\'échéance</th><th>Montant</th><th>Mode de paiement</th></tr></thead>'+
+    '<tbody>'+trs+
+    '<tr class="total-row"><td></td><td>TOTAL DÛ</td><td style="color:var(--red)">'+fmt(montant)+'</td><td></td></tr>'+
+    '</tbody></table>';
+
+  if (adjusted) html += '<p class="note">La dernière échéance est ajustée pour solder exactement le montant dû.</p>';
+  if (premier > 0) html += '<p class="note" style="color:#16A34A">Premier versement de '+fmt(premier)+' déduit — mensualités calculées sur le solde de '+fmt(solde)+'.</p>';
+  document.getElementById('table-container').innerHTML = html;
+}
+
+document.getElementById('start').value = new Date().toISOString().slice(0, 10);
+</script>
+</body>
+</html>
