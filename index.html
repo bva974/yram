@@ -263,14 +263,14 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F2F5;color:var(--text
 </div>
 
 <script>
-const KEY = 'yram_creanciers_v2';
+onst KEY = 'yram_creanciers_v2';
 const DEFAULTS = [
-  {id:'prudence', nom:'Prudence Créole',      addr:'32 Rue Alexis de Villeneuve, 97400 Saint-Denis'},
-  {id:'edf', nom:'EDF',      addr:'8 av Georges Brassens CS 62009 97744 Saint-Denis Cedex 9'},
-  {id:'dioneo', nom:'DIONEO',      addr:'53, rue Saint Anne - CS 61011 97743 Saint-Denis Cedex 9'},
-  {id:'runeo', nom:'RUNEO',      addr:'3, rue Sainte-Anne CS 61011 97743 Saint-Denis Cedex 9'},
-  {id:'eaux de la possession', nom:'EAUX DE LA POSSESSION',      addr:'rue Waldeck Rochet BP 92 97419 la Possession'},
-  {id:'telco oi', nom:'TELCO OI',      addr:'1 Rue Joseph Wetzell (Technopole), 97490 Saint-Denis'},
+  {id:'prudence', nom:'Prudence Créole', addr:'32 Rue Alexis de Villeneuve, 97400 Saint-Denis'},
+  {id:'edf', nom:'EDF', addr:'8 av Georges Brassens CS 62009 97744 Saint-Denis Cedex 9'},
+  {id:'dioneo', nom:'DIONEO', addr:'53, rue Saint Anne - CS 61011 97743 Saint-Denis Cedex 9'},
+  {id:'runeo', nom:'RUNEO', addr:'3, rue Sainte-Anne CS 61011 97743 Saint-Denis Cedex 9'},
+  {id:'eaux_de_la_possession', nom:'EAUX DE LA POSSESSION', addr:'rue Waldeck Rochet BP 92 97419 La Possession'},
+  {id:'telco_oi', nom:'TELCO OI', addr:'1 Rue Joseph Wetzell (Technopole), 97490 Saint-Denis'},
 ];
 
 function getList(){ try{ return JSON.parse(localStorage.getItem(KEY))||DEFAULTS; }catch{ return DEFAULTS; } }
