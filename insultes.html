@@ -60,6 +60,27 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F8F9FB;color:var(--text
 .disclaimer{text-align:center;font-size:11px;color:#9CA3AF;padding:1rem;font-style:italic;}
 
 .panel{display:none;} .panel.active{display:block;}
+
+/* Machine à sous */
+.slot-section{background:#FFF0F3;border-radius:14px;padding:1.5rem;margin-bottom:1.25rem;text-align:center;border:2px solid #FFCCD9;}
+.slot-title{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#9B1D35;margin-bottom:1rem;}
+.slot-machine{display:flex;gap:6px;justify-content:center;margin-bottom:1.25rem;}
+.reel{width:80px;height:72px;background:#fff;border:2px solid #FFCCD9;border-radius:8px;overflow:hidden;position:relative;}
+.reel-inner{position:absolute;top:0;left:0;width:100%;transition:top .0s;}
+.reel-inner.spinning{animation:none;}
+.reel-item{height:72px;display:flex;align-items:center;justify-content:center;font-size:28px;}
+.reel-shine{position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(255,255,255,.5) 0%,transparent 30%,transparent 70%,rgba(0,0,0,.05) 100%);pointer-events:none;border-radius:6px;}
+.reel-border{position:absolute;top:50%;transform:translateY(-50%);left:-2px;right:-2px;height:72px;border:2px solid var(--red);border-radius:8px;pointer-events:none;box-shadow:0 0 8px rgba(212,0,63,.3);}
+.btn-slot{background:linear-gradient(135deg,#D4003F,#A8002F);color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:800;cursor:pointer;letter-spacing:.04em;box-shadow:0 4px 14px rgba(212,0,63,.4);transition:all .15s;position:relative;overflow:hidden;}
+.btn-slot:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(212,0,63,.5);}
+.btn-slot:active{transform:scale(.97);}
+.btn-slot.spinning{opacity:.6;cursor:not-allowed;}
+.slot-result{min-height:48px;margin-top:1rem;}
+.slot-result-text{color:#7F1D35;font-size:14px;font-weight:700;line-height:1.5;padding:.75rem 1rem;background:#fff;border-radius:8px;border:1px solid #FFCCD9;animation:fadein .3s ease;}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.slot-result-text.jackpot{border-color:var(--red);background:#FFF0F3;color:#7F1D35;}
+.jackpot-flash{animation:flash .15s ease 4;}
+@keyframes flash{0%,100%{background:rgba(212,0,63,.12)}50%{background:rgba(212,0,63,.35)}}
 </style>
 </head>
 <body>
@@ -74,7 +95,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F8F9FB;color:var(--text
     <a href="index.html">Accueil</a>
     <a href="protocole.html">Protocole d'accord</a>
     <a href="echeancier.html">Échéancier</a>
-    <a href="insultes.html" class="active">💢 Défouloir</a>
+    <a href="insultes.html" class="active">Défouloir</a>
   </nav>
 </div>
 
@@ -86,7 +107,18 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F8F9FB;color:var(--text
 
 <div class="container">
 
-  <div class="tabs">
+  <div class="slot-section">
+  <div class="slot-title">🎰 Machine à sous du désespoir</div>
+  <div class="slot-machine">
+    <div class="reel" id="reel-0"><div class="reel-inner" id="ri-0"></div><div class="reel-shine"></div><div class="reel-border"></div></div>
+    <div class="reel" id="reel-1"><div class="reel-inner" id="ri-1"></div><div class="reel-shine"></div><div class="reel-border"></div></div>
+    <div class="reel" id="reel-2"><div class="reel-inner" id="ri-2"></div><div class="reel-shine"></div><div class="reel-border"></div></div>
+  </div>
+  <button class="btn-slot" id="btn-slot" onclick="spinSlot()">🎰 &nbsp;TENTER SA CHANCE</button>
+  <div class="slot-result" id="slot-result"></div>
+</div>
+
+<div class="tabs">
     <div class="tab active" onclick="switchTab('insultes', this)">💢 Insultes libératrices</div>
     <div class="tab" onclick="switchTab('excuses', this)">🤡 Excuses bidons</div>
   </div>
@@ -454,6 +486,122 @@ function genExcuse() {
   document.getElementById('res-excuse').textContent = rand(excuses[cat][culot]);
   show('result-excuse');
 }
+
+// ── MACHINE À SOUS ──────────────────────────────────────────────────────
+const REELS = [
+  ['👻','🤞','😭','😤','🧐','🕵️','💸'],
+  ['👻','🤞','😭','😤','🧐','🕵️','💸'],
+  ['👻','🤞','😭','😤','🧐','🕵️','💸'],
+];
+const PROFILS = ['fantome','promesse','victime','agressif','philosophe','disparu','partiel'];
+const EMOJI_PROFIL = {'👻':'fantome','🤞':'promesse','😭':'victime','😤':'agressif','🧐':'philosophe','🕵️':'disparu','💸':'partiel'};
+
+let slotSpinning = false;
+
+function buildReel(id, items) {
+  const el = document.getElementById('ri-' + id);
+  el.innerHTML = '';
+  items.forEach(e => {
+    const d = document.createElement('div');
+    d.className = 'reel-item';
+    d.textContent = e;
+    el.appendChild(d);
+  });
+  el.style.top = '0px';
+}
+
+function initReels() {
+  REELS.forEach((r, i) => buildReel(i, r));
+}
+
+function spinReel(reelId, finalIdx, delay, duration) {
+  return new Promise(resolve => {
+    const el = document.getElementById('ri-' + reelId);
+    const itemH = 72;
+    const totalItems = REELS[reelId].length;
+    const loops = 3;
+    const totalFrames = totalItems * loops + finalIdx;
+    let frame = 0;
+    const speed = duration / (totalFrames * 16);
+    let pos = 0;
+
+    // Construire une longue liste pour l'animation
+    const allItems = [];
+    for(let l = 0; l < loops + 1; l++) {
+      REELS[reelId].forEach(e => allItems.push(e));
+    }
+    el.innerHTML = '';
+    allItems.forEach(e => {
+      const d = document.createElement('div');
+      d.className = 'reel-item';
+      d.textContent = e;
+      el.appendChild(d);
+    });
+    el.style.top = '0px';
+
+    setTimeout(() => {
+      const targetPos = -(totalItems * loops + finalIdx) * itemH;
+      el.style.transition = `top ${duration}ms cubic-bezier(.17,.67,.35,1)`;
+      el.style.top = targetPos + 'px';
+      setTimeout(() => {
+        el.style.transition = 'none';
+        el.innerHTML = '';
+        REELS[reelId].forEach(e => {
+          const d = document.createElement('div');
+          d.className = 'reel-item';
+          d.textContent = e;
+          el.appendChild(d);
+        });
+        el.style.top = -(finalIdx * itemH) + 'px';
+        resolve();
+      }, duration + 50);
+    }, delay);
+  });
+}
+
+async function spinSlot() {
+  if (slotSpinning) return;
+  slotSpinning = true;
+  const btn = document.getElementById('btn-slot');
+  btn.classList.add('spinning');
+  btn.textContent = '⏳  En cours...';
+  document.getElementById('slot-result').innerHTML = '';
+
+  // Choisir 3 indices aléatoires
+  const idx = [
+    Math.floor(Math.random() * PROFILS.length),
+    Math.floor(Math.random() * PROFILS.length),
+    Math.floor(Math.random() * PROFILS.length),
+  ];
+
+  // Niveau aléatoire
+  const niveau = String(Math.ceil(Math.random() * 3));
+
+  await Promise.all([
+    spinReel(0, idx[0], 0, 700),
+    spinReel(1, idx[1], 150, 900),
+    spinReel(2, idx[2], 300, 1100),
+  ]);
+
+  // Jackpot = 3 profils identiques
+  const jackpot = idx[0] === idx[1] && idx[1] === idx[2];
+  const profil = PROFILS[jackpot ? idx[0] : idx[Math.floor(Math.random()*3)]];
+
+  // Récupérer une insulte
+  const texte = rand(insultes[profil][niveau]);
+
+  const resultEl = document.getElementById('slot-result');
+  const div = document.createElement('div');
+  div.className = 'slot-result-text' + (jackpot ? ' jackpot jackpot-flash' : '');
+  div.textContent = (jackpot ? '🎰 JACKPOT — ' : '') + texte;
+  resultEl.appendChild(div);
+
+  btn.classList.remove('spinning');
+  btn.textContent = '🎰  RETENTER SA CHANCE';
+  slotSpinning = false;
+}
+
+initReels();
 
 function copier(id) {
   const texte = document.getElementById(id).textContent;
