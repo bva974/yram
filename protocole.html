@@ -70,11 +70,13 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F2F5;color:var(--text
 
 /* DOCUMENT */
 .doc{font-family:'Segoe UI',Arial,sans-serif;color:#1A1A2E;}
-.doc-header{background:var(--navy);color:#fff;padding:1.75rem 2.5rem 1.5rem;}
-.doc-brand{font-size:10px;font-weight:700;letter-spacing:.14em;color:#A8C0E8;text-transform:uppercase;margin-bottom:4px;}
-.doc-title{font-size:26px;font-weight:700;letter-spacing:.04em;}
-.doc-sub{font-size:13px;color:#A8C0E8;font-style:italic;margin-top:4px;}
-.doc-redbar{height:4px;background:var(--red);}
+.doc-header{background:#fff;border-bottom:2px solid var(--red);padding:1.25rem 2.5rem 1rem;display:flex;align-items:flex-end;justify-content:space-between;}
+.doc-header-left{}
+.doc-brand{font-size:9px;font-weight:800;letter-spacing:.16em;color:#9CA3AF;text-transform:uppercase;margin-bottom:5px;}
+.doc-title{font-size:22px;font-weight:800;letter-spacing:-.01em;color:#111;}
+.doc-sub{font-size:11px;color:#6B7280;margin-top:3px;font-style:normal;}
+.doc-ref-badge{font-size:10px;font-weight:700;background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;border-radius:5px;padding:4px 10px;white-space:nowrap;align-self:center;}
+.doc-redbar{display:none;}
 .doc-body{padding:1.75rem 2.5rem;}
 .parties-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
 .party-card{background:#F3F4F6;border-radius:6px;padding:.875rem 1rem;border-left:3px solid #6B7280;}
@@ -432,9 +434,12 @@ function render(){
 
   document.getElementById('preview').innerHTML=`<div class="doc">
   <div class="doc-header">
-    <div class="doc-brand">YRAM RECOUVREMENT</div>
-    <div class="doc-title">PROTOCOLE D'ACCORD</div>
-    <div class="doc-sub">Échéancier de Règlement${ref?' — Réf. '+ref:''}</div>
+    <div class="doc-header-left">
+      <div class="doc-brand">YRAM RECOUVREMENT</div>
+      <div class="doc-title">PROTOCOLE D'ACCORD</div>
+      <div class="doc-sub">Échéancier de Règlement</div>
+    </div>
+    ${ref?`<div class="doc-ref-badge">Réf. ${ref}</div>`:''}
   </div>
   <div class="doc-redbar"></div>
   <div class="doc-body">
