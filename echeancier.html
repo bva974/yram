@@ -284,8 +284,35 @@ function generate() {
     n++;
   }
 
+  // Si la dernière échéance régulière est < 50% d'une mensualité, on la fusionne avec l'avant-dernière
+  var echRows = rows.filter(function(r){ return !r.isPremier; });
+  if (echRows.length >= 2) {
+    var lastEch = echRows[echRows.length-1];
+    var seuil = mensual * 0.5;
+    if (lastEch.montant < seuil) {
+      var prevEch = echRows[echRows.length-2];
+      prevEch.montant = Math.round((prevEch.montant + lastEch.montant) * 100) / 100;
+      prevEch.adjusted = true;
+      rows.splice(rows.indexOf(lastEch), 1);
+      rows.forEach(function(r, i){ r.n = i+1; });
+      echRows = rows.filter(function(r){ return !r.isPremier; });
+    }
+  }
+  // Marquer la dernière échéance si ajustée
+  if (echRows.length > 1) {
+    echRows[echRows.length-1].adjusted = echRows[echRows.length-1].montant !== mensual;
+  }
+  // Si la dernière échéance > la première, échanger les montants
+  if (echRows.length >= 2 && echRows[echRows.length-1].montant > echRows[0].montant) {
+    var tmp = echRows[0].montant;
+    echRows[0].montant = echRows[echRows.length-1].montant;
+    echRows[echRows.length-1].montant = tmp;
+    echRows[0].adjusted = true;
+    echRows[echRows.length-1].adjusted = echRows[echRows.length-1].montant !== mensual;
+  }
+
   var last     = rows[rows.length-1];
-  var adjusted = rows.length > 1 && !last.isPremier && last.montant !== mensual;
+  var adjusted = last && !last.isPremier && last.adjusted;
 
   document.getElementById('s-total').textContent = fmt(montant);
   document.getElementById('s-nb').textContent    = rows.length;
@@ -295,9 +322,8 @@ function generate() {
   var trs = rows.map(function(r) {
     var badge    = r.isPremier ? ' <span style="font-size:9px;background:#16A34A;color:#fff;border-radius:3px;padding:1px 5px;font-weight:700;vertical-align:middle">1er versement</span>' : '';
     var rowStyle = r.isPremier ? ' style="background:#EEF9F0"' : '';
-    var isLast   = r === last;
     return '<tr'+rowStyle+'><td class="n-cell">'+r.n+'</td><td>'+fmtD(r.date)+'</td>'+
-      '<td class="'+(isLast && adjusted ? 'amt-adjusted' : '')+'">'+fmt(r.montant)+badge+'</td>'+
+      '<td class="'+(r.adjusted ? 'amt-adjusted' : '')+'">'+fmt(r.montant)+badge+'</td>'+
       '<td style="color:var(--muted)">'+r.mode+'</td></tr>';
   }).join('');
 
