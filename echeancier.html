@@ -8,41 +8,57 @@
 :root{--navy:#1A1A1A;--blue:#2E5FA3;--blue-light:#D6E4F7;--blue-mid:#185FA5;--red:#D4003F;--border:#E2E8F0;--text:#1A1A2E;--muted:#6B7280;--bg:#F0F2F5;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
-.topbar{background:var(--navy);color:#fff;padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;}
-.topbar-brand{font-size:15px;font-weight:700;letter-spacing:.08em;}
-.topbar-sub{font-size:11px;color:#A8C0E8;margin-top:2px;}
-.nav{display:flex;gap:4px;}
-.nav a{color:#A8C0E8;text-decoration:none;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;transition:background .15s;}
-.nav a:hover{background:rgba(255,255,255,.1);color:#fff;}
-.nav a.active{background:rgba(255,255,255,.15);color:#fff;}
-.red-bar{height:4px;background:var(--red);}
+.topbar{background:#fff;color:var(--text);padding:0 1.5rem;height:50px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--red);}
+.topbar-left{display:flex;align-items:center;gap:16px;}
+.topbar-brand{font-size:13px;font-weight:800;letter-spacing:.12em;color:#111;text-transform:uppercase;}
+.topbar-divider{width:1px;height:18px;background:#E5E7EB;}
+.topbar-sub{font-size:11px;color:#9CA3AF;font-weight:500;}
+.nav{display:flex;gap:0;align-items:center;}
+.nav a{color:#6B7280;text-decoration:none;font-size:11.5px;font-weight:600;padding:6px 14px;transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-2px;}
+.nav a:hover{color:#111;}
+.nav a.active{color:var(--red);border-bottom-color:var(--red);}
+.red-bar{display:none;}
 .page{max-width:860px;margin:2rem auto;padding:0 1.5rem;}
 
-.params{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1.5rem;}
-.params-top{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.25rem;}
+.params{background:#F8F9FB;border-radius:10px;margin-bottom:1.5rem;overflow:visible;}
+.params-blocks{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem;}
+.params-block{border-radius:7px;overflow:visible;}
+.params-block-header{display:flex;align-items:center;gap:6px;padding:.3rem .75rem;font-size:9px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;border-radius:7px 7px 0 0;}
+.params-block-body{background:#fff;padding:.65rem .75rem .75rem;border-radius:0 0 7px 7px;border:1px solid rgba(0,0,0,.07);border-top:none;display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.params-block-body.single{grid-template-columns:1fr;}
+/* Créance — bleu */
+.block-creance-p .params-block-header{background:#DBEAFE;color:#1E3A6E;}
+.block-creance-p .field input{background:#EFF6FF;border-color:#BFDBFE;}
+.block-creance-p .field input:focus{border-color:#1E40AF;background:#fff;box-shadow:0 0 0 2px rgba(30,64,175,.1);}
+/* Échéancier — vert */
+.block-ech-p .params-block-header{background:#D1FAE5;color:#065F46;}
+.block-ech-p .field input,.block-ech-p .field select{background:#F0FDF4;border-color:#A7F3D0;}
+.block-ech-p .field input:focus,.block-ech-p .field select:focus{border-color:#065F46;background:#fff;box-shadow:0 0 0 2px rgba(6,95,70,.1);}
+.block-ech-p .tbtn{background:#F0FDF4;border-color:#A7F3D0;color:#065F46;}
+.block-ech-p .tbtn.on{background:#D1FAE5;border-color:#065F46;color:#065F46;}
+.params-top{display:none;}
 
 .field{display:flex;flex-direction:column;}
 .field-lbl{height:16px;display:flex;align-items:center;gap:5px;margin-bottom:4px;}
-.field-lbl span{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
+.field-lbl span{font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
 .field-lbl small{font-size:10px;font-weight:400;color:#B0B8C4;white-space:nowrap;}
-.field input,.field select{border:1px solid var(--border);border-radius:6px;padding:8px 11px;font-size:14px;color:var(--text);background:#fff;outline:none;width:100%;min-width:0;height:38px;box-sizing:border-box;transition:border-color .15s;}
-.field input:focus,.field select:focus{border-color:var(--blue-mid);}
-.field input.big{font-size:14px;font-weight:700;color:var(--blue-mid);}
-.hint{font-size:11px;color:var(--blue-mid);font-weight:600;height:16px;margin-top:4px;overflow:hidden;}
+.field input,.field select{border:1px solid var(--border);border-radius:5px;padding:5px 9px;font-size:13px;color:var(--text);background:#fff;outline:none;width:100%;min-width:0;height:34px;box-sizing:border-box;transition:border-color .15s,background .15s;}
+.field input.big{font-size:13px;font-weight:700;color:#1E40AF;}
+.hint{font-size:11px;color:var(--blue-mid);font-weight:600;height:16px;margin-top:3px;overflow:hidden;}
 
-.mode-sep{border-top:1px solid var(--border);padding-top:1.25rem;}
-.mode-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem;}
-.toggle-row{display:flex;gap:8px;margin-bottom:.875rem;}
-.tbtn{flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;background:#fff;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;}
-.tbtn.on{border-color:var(--blue-mid);background:#EEF4FC;color:var(--blue-mid);}
-.inputs-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-.inactive input{background:#F8F9FA;color:#bbb;cursor:not-allowed;}
+.mode-sep{padding-top:0;}
+.mode-label{font-size:9px;font-weight:800;color:#065F46;text-transform:uppercase;letter-spacing:.09em;margin-bottom:.5rem;}
+.toggle-row{display:flex;gap:6px;margin-bottom:.75rem;}
+.tbtn{flex:1;padding:5px 8px;border:1.5px solid #A7F3D0;border-radius:5px;background:#F0FDF4;font-size:11px;font-weight:700;color:#065F46;cursor:pointer;transition:all .15s;}
+.tbtn.on{border-color:#065F46;background:#D1FAE5;color:#065F46;}
+.inputs-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.inactive input{background:#F0FDF4;color:#A7F3D0;cursor:not-allowed;}
 
 .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem;}
 .sum-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:.875rem 1rem;}
 .sum-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
 .sum-val{font-size:20px;font-weight:700;color:var(--text);}
-.sum-val.blue{color:var(--blue-mid);}
+.sum-val.blue{color:#065F46;}
 .sum-val.red{color:var(--red);}
 
 .table-card{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1.5rem;}
@@ -52,13 +68,13 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 .btn-print:hover{background:#0C447C;}
 
 table{width:100%;border-collapse:collapse;font-size:13px;}
-thead tr{background:var(--navy);color:#fff;}
+thead tr{background:#065F46;color:#fff;}
 th{padding:9px 12px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.05em;}
 td{padding:9px 12px;border-bottom:1px solid var(--border);}
 tr:last-child td{border-bottom:none;}
-tr:nth-child(even) td{background:#FAFBFD;}
-tr.total-row td{background:var(--blue-light);font-weight:700;color:var(--navy);border-top:2px solid var(--blue);}
-.n-cell{color:var(--blue-mid);font-weight:700;}
+tr:nth-child(even) td{background:#F0FDF4;}
+tr.total-row td{background:#D1FAE5;font-weight:700;color:#065F46;border-top:2px solid #065F46;}
+.n-cell{color:#065F46;font-weight:700;}
 .amt-adjusted{color:var(--red);font-weight:700;}
 .empty{text-align:center;padding:3rem;color:var(--muted);font-size:13px;}
 .note{font-size:11px;color:var(--muted);font-style:italic;padding:.6rem 1.25rem .75rem;}
@@ -75,8 +91,9 @@ tr.total-row td{background:var(--blue-light);font-weight:700;color:var(--navy);b
 <body>
 
 <div class="topbar">
-  <div>
+  <div class="topbar-left">
     <div class="topbar-brand">YRAM RECOUVREMENT</div>
+    <div class="topbar-divider"></div>
     <div class="topbar-sub">Gestionnaire d'échéancier</div>
   </div>
   <nav class="nav">
@@ -90,59 +107,82 @@ tr.total-row td{background:var(--blue-light);font-weight:700;color:var(--navy);b
 <div class="page">
 
   <div class="params">
-    <div class="params-top">
 
-      <div class="field">
-        <div class="field-lbl"><span>Montant total dû (€)</span></div>
-        <input id="montant" type="number" step="0.01" min="0" placeholder="ex : 1 200,00" class="big" oninput="generate()">
-        <div class="hint"></div>
+    <div class="params-blocks">
+
+      <!-- Créance -->
+      <div class="params-block block-creance-p">
+        <div class="params-block-header">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="#1E40AF" stroke-width="1.5"/><path d="M8 5v1.5M8 9.5V11M6.5 7.25C6.5 6.56 7.17 6 8 6s1.5.56 1.5 1.25c0 .83-.75 1.25-1.5 1.5v.75" stroke="#1E40AF" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Créance
+        </div>
+        <div class="params-block-body">
+          <div class="field">
+            <div class="field-lbl"><span>Montant total dû (€)</span></div>
+            <input id="montant" type="number" step="0.01" min="0" placeholder="ex : 1 200,00" class="big" oninput="generate()">
+            <div class="hint"></div>
+          </div>
+          <div class="field">
+            <div class="field-lbl"><span>Premier paiement (€)</span><small>— optionnel</small></div>
+            <input id="premier" type="number" step="0.01" min="0" placeholder="ex : 200,00" oninput="generate()">
+            <div class="hint" id="hint-solde"></div>
+          </div>
+        </div>
       </div>
 
-      <div class="field">
-        <div class="field-lbl"><span>Premier paiement (€)</span><small>— optionnel</small></div>
-        <input id="premier" type="number" step="0.01" min="0" placeholder="ex : 200,00" oninput="generate()">
-        <div class="hint" id="hint-solde"></div>
-      </div>
-
-      <div class="field">
-        <div class="field-lbl"><span>1ère échéance</span></div>
-        <input id="start" type="date" oninput="generate()">
-        <div class="hint"></div>
-      </div>
-
-      <div class="field">
-        <div class="field-lbl"><span>Mode de paiement</span></div>
-        <select id="mode" onchange="generate()">
-          <option>Carte bancaire</option>
-          <option>Virement</option>
-          <option>Chèque</option>
-          <option>Espèces</option>
-          <option>Prélèvement CB</option>
-        </select>
-        <div class="hint"></div>
+      <!-- Échéancier -->
+      <div class="params-block block-ech-p">
+        <div class="params-block-header">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="#065F46" stroke-width="1.5"/><path d="M5 2v2M11 2v2M2 7h12" stroke="#065F46" stroke-width="1.2" stroke-linecap="round"/><path d="M5 10h1M8 10h1M11 10h1" stroke="#065F46" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Échéancier
+        </div>
+        <div class="params-block-body">
+          <div class="field">
+            <div class="field-lbl"><span>1ère échéance</span></div>
+            <input id="start" type="date" oninput="generate()">
+            <div class="hint"></div>
+          </div>
+          <div class="field">
+            <div class="field-lbl"><span>Mode de paiement</span></div>
+            <select id="mode" onchange="generate()">
+              <option>Carte bancaire</option>
+              <option>Virement</option>
+              <option>Chèque</option>
+              <option>Espèces</option>
+              <option>Prélèvement CB</option>
+            </select>
+            <div class="hint"></div>
+          </div>
+        </div>
       </div>
 
     </div>
 
-    <div class="mode-sep">
-      <div class="mode-label">Définir les échéances par</div>
-      <div class="toggle-row">
-        <button class="tbtn on" id="btn-mens" onclick="setMode('mens')">Montant de la mensualité</button>
-        <button class="tbtn"    id="btn-nb"   onclick="setMode('nb')">Nombre d'échéances</button>
-      </div>
-      <div class="inputs-row">
-        <div class="field" id="block-mens">
-          <div class="field-lbl"><span>Mensualité (€)</span></div>
-          <input id="mensualite" type="number" step="1" min="1" placeholder="ex : 100" oninput="generate()">
-          <div class="hint" id="hint-mens"></div>
-        </div>
-        <div class="field inactive" id="block-nb">
-          <div class="field-lbl"><span>Nombre d'échéances</span></div>
-          <input id="nb" type="number" step="1" min="1" max="240" placeholder="ex : 6" disabled oninput="generate()">
-          <div class="hint" id="hint-nb"></div>
+    <!-- Définition des échéances -->
+    <div class="params-block block-ech-p" style="margin-top:0;">
+      <div class="params-block-header">Définir les échéances par</div>
+      <div class="params-block-body single" style="border-radius:0 0 7px 7px;">
+        <div class="mode-sep">
+          <div class="toggle-row">
+            <button class="tbtn on" id="btn-mens" onclick="setMode('mens')">Montant de la mensualité</button>
+            <button class="tbtn"    id="btn-nb"   onclick="setMode('nb')">Nombre d'échéances</button>
+          </div>
+          <div class="inputs-row">
+            <div class="field" id="block-mens">
+              <div class="field-lbl"><span>Mensualité (€)</span></div>
+              <input id="mensualite" type="number" step="1" min="1" placeholder="ex : 100" oninput="generate()">
+              <div class="hint" id="hint-mens"></div>
+            </div>
+            <div class="field inactive" id="block-nb">
+              <div class="field-lbl"><span>Nombre d'échéances</span></div>
+              <input id="nb" type="number" step="1" min="1" max="240" placeholder="ex : 6" disabled oninput="generate()">
+              <div class="hint" id="hint-nb"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
   </div>
 
   <div class="summary" id="summary" style="display:none">
