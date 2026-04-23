@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YRAM — Générateur d'insultes</title>
+<title>YRAM — Défouloir</title>
 <style>
 :root{--navy:#1A1A1A;--red:#D4003F;--border:#E2E8F0;--text:#1A1A2E;--muted:#6B7280;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#F8F9FB;color:var(--text);font-size:14px;min-height:100vh;}
-.topbar{background:#fff;color:var(--text);padding:0 1.5rem;height:50px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--red);}
+.topbar{background:#fff;padding:0 1.5rem;height:50px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--red);}
 .topbar-left{display:flex;align-items:center;gap:16px;}
 .topbar-brand{font-size:13px;font-weight:800;letter-spacing:.12em;color:#111;text-transform:uppercase;}
 .topbar-divider{width:1px;height:18px;background:#E5E7EB;}
@@ -18,36 +18,48 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F8F9FB;color:var(--text
 .nav a:hover{color:#111;}
 .nav a.active{color:var(--red);border-bottom-color:var(--red);}
 
-.hero{text-align:center;padding:3rem 1rem 2rem;}
+.hero{text-align:center;padding:2.5rem 1rem 1.5rem;}
 .hero-badge{display:inline-block;background:#FFF0F3;color:var(--red);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:1rem;}
 .hero-title{font-size:28px;font-weight:800;color:#111;margin-bottom:.5rem;}
-.hero-sub{font-size:13px;color:#6B7280;max-width:380px;margin:0 auto;}
+.hero-sub{font-size:13px;color:#6B7280;max-width:420px;margin:0 auto;}
 
-.container{max-width:620px;margin:0 auto;padding:0 1.5rem 3rem;}
+.container{max-width:640px;margin:0 auto;padding:0 1.5rem 3rem;}
 
-.card{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1.5rem;}
-.card-header{padding:.75rem 1.25rem;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;}
-.card-body{padding:1.25rem;}
+.tabs{display:flex;gap:8px;margin-bottom:1.25rem;}
+.tab{flex:1;padding:9px;border:1.5px solid #D1D5DB;border-radius:8px;background:#F9FAFB;font-size:12px;font-weight:700;color:#9CA3AF;cursor:pointer;transition:all .15s;text-align:center;}
+.tab.active{background:var(--red);border-color:var(--red);color:#fff;}
+.tab:not(.active):hover{background:#FFF0F3;border-color:#FFCCD9;color:var(--red);}
 
-.field{display:flex;flex-direction:column;gap:4px;margin-bottom:.75rem;}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1rem;}
+.card-header{padding:.65rem 1.1rem;font-size:9px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;border-bottom:1px solid var(--border);color:#6B7280;}
+.card-body{padding:1rem;}
+
+.field{display:flex;flex-direction:column;gap:3px;margin-bottom:.65rem;}
 .field label{font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;}
-.field select,.field input{border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;color:var(--text);background:#fff;outline:none;width:100%;transition:border-color .15s;}
-.field select:focus,.field input:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(212,0,63,.08);}
+.field select{border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;color:var(--text);background:#fff;outline:none;width:100%;transition:border-color .15s;}
+.field select:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(212,0,63,.08);}
 
-.btn-gen{width:100%;padding:11px;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s;letter-spacing:.02em;margin-top:.25rem;}
+.btn-gen{width:100%;padding:11px;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s;margin-top:.25rem;}
 .btn-gen:hover{background:#A8002F;}
 .btn-gen:active{transform:scale(.98);}
 
-.result-box{background:#FFF8F9;border:2px solid #FFCCD9;border-radius:10px;padding:1.5rem;text-align:center;margin-top:1.25rem;display:none;position:relative;}
-.result-box.show{display:block;animation:pop .3s ease;}
-@keyframes pop{0%{transform:scale(.95);opacity:0}100%{transform:scale(1);opacity:1}}
-.result-emoji{font-size:36px;margin-bottom:.75rem;}
-.result-text{font-size:17px;font-weight:700;color:#1A1A2E;line-height:1.5;margin-bottom:.75rem;}
+.result-box{background:#FFF8F9;border:2px solid #FFCCD9;border-radius:10px;padding:1.25rem;text-align:center;margin-top:1rem;display:none;}
+.result-box.show{display:block;animation:pop .25s ease;}
+@keyframes pop{0%{transform:scale(.96);opacity:0}100%{transform:scale(1);opacity:1}}
+.result-emoji{font-size:32px;margin-bottom:.6rem;}
+.result-text{font-size:16px;font-weight:700;color:#1A1A2E;line-height:1.55;margin-bottom:.5rem;}
 .result-sub{font-size:11px;color:#9CA3AF;font-style:italic;}
 .btn-copy{background:none;border:1px solid #FFCCD9;border-radius:6px;color:var(--red);font-size:11px;font-weight:700;padding:5px 12px;cursor:pointer;transition:all .15s;margin-top:.5rem;}
 .btn-copy:hover{background:#FFF0F3;}
 
+.excuse-box{background:#FFFBF0;border:2px solid #FDE68A;border-radius:10px;padding:1.25rem;text-align:center;margin-top:1rem;display:none;}
+.excuse-box.show{display:block;animation:pop .25s ease;}
+.excuse-text{font-size:15px;font-weight:600;color:#92400E;line-height:1.55;margin-bottom:.5rem;}
+.excuse-label{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#B45309;margin-bottom:.5rem;}
+
 .disclaimer{text-align:center;font-size:11px;color:#9CA3AF;padding:1rem;font-style:italic;}
+
+.panel{display:none;} .panel.active{display:block;}
 </style>
 </head>
 <body>
@@ -67,66 +79,90 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F8F9FB;color:var(--text
 </div>
 
 <div class="hero">
-  <div class="hero-badge">⚠️ Usage interne strictement réservé</div>
+  <div class="hero-badge">⚠️ Usage interne — ne jamais envoyer</div>
   <div class="hero-title">Le Défouloir YRAM 💢</div>
-  <div class="hero-sub">Pour les jours où le débiteur rappelle pas. Jamais envoyé, juste pensé très fort.</div>
+  <div class="hero-sub">Insultes libératrices et excuses bidons — pour les jours où le débiteur rappelle pas. Jamais.</div>
 </div>
 
 <div class="container">
 
-  <div class="card">
-    <div class="card-header">🎯 Paramètres du débiteur</div>
-    <div class="card-body">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('insultes', this)">💢 Insultes libératrices</div>
+    <div class="tab" onclick="switchTab('excuses', this)">🤡 Excuses bidons</div>
+  </div>
 
-      <div class="field">
-        <label>Profil du débiteur</label>
-        <select id="profil">
-          <option value="fantome">Le Fantôme (ne répond jamais)</option>
-          <option value="promesse">Le Roi de la Promesse (toujours "vendredi c'est sûr")</option>
-          <option value="victime">La Victime Cosmique (toujours une excuse)</option>
-          <option value="agressif">L'Agressif (te rappelle pour se plaindre)</option>
-          <option value="philosophe">Le Philosophe (conteste la dette depuis 3 ans)</option>
-          <option value="disparu">Le Grand Disparu (changé de numéro, d'adresse et de prénom)</option>
-          <option value="partiel">Le Payeur Partiel (envoie 12€ sur 1400€ et disparaît)</option>
-        </select>
+  <!-- PANEL INSULTES -->
+  <div class="panel active" id="panel-insultes">
+    <div class="card">
+      <div class="card-header">🎯 Profil du débiteur</div>
+      <div class="card-body">
+        <div class="field">
+          <label>Profil</label>
+          <select id="profil">
+            <option value="fantome">👻 Le Fantôme — ne répond jamais</option>
+            <option value="promesse">🤞 Le Roi de la Promesse — "vendredi c'est sûr" depuis 8 mois</option>
+            <option value="victime">😭 La Victime Cosmique — toujours une catastrophe</option>
+            <option value="agressif">😤 L'Agressif — te rappelle pour se plaindre</option>
+            <option value="philosophe">🧐 Le Philosophe — conteste la dette depuis 3 ans</option>
+            <option value="disparu">🕵️ Le Grand Disparu — nouveau numéro, même dette</option>
+            <option value="partiel">💸 Le Payeur Partiel — 12€ sur 1400€ puis silence</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Niveau d'exaspération</label>
+          <select id="niveau">
+            <option value="1">😤 Agacé</option>
+            <option value="2">😠 Hors de moi</option>
+            <option value="3">🤯 Au bord du meurtre</option>
+          </select>
+        </div>
+        <button class="btn-gen" onclick="genInsulte()">💢 Générer</button>
+        <div class="result-box" id="result-insulte">
+          <div class="result-emoji" id="res-emoji"></div>
+          <div class="result-text" id="res-text"></div>
+          <div class="result-sub">— À ne jamais envoyer. Jamais. —</div><br>
+          <button class="btn-copy" onclick="copier('res-text')">📋 Copier (pour rien faire avec)</button>
+        </div>
       </div>
-
-      <div class="field">
-        <label>Niveau d'exaspération</label>
-        <select id="niveau">
-          <option value="1">😤 Légèrement agacé</option>
-          <option value="2">😠 Franchement énervé</option>
-          <option value="3">🤯 Au bord du gouffre</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Durée d'impayé</label>
-        <select id="duree">
-          <option value="court">Moins de 3 mois</option>
-          <option value="moyen">3 à 12 mois</option>
-          <option value="long">Plus d'un an</option>
-          <option value="eternite">Depuis une éternité (dossier hérité)</option>
-        </select>
-      </div>
-
-      <button class="btn-gen" onclick="generer()">💢 Générer l'insulte de la journée</button>
-
-      <div class="result-box" id="result">
-        <div class="result-emoji" id="res-emoji">😤</div>
-        <div class="result-text" id="res-text"></div>
-        <div class="result-sub">— À ne jamais envoyer. Jamais. —</div>
-        <br>
-        <button class="btn-copy" onclick="copier()">📋 Copier (pour rien faire avec)</button>
-      </div>
-
     </div>
   </div>
 
-  <div class="disclaimer">
-    Ce générateur est purement fictif et thérapeutique. YRAM Recouvrement se désolidarise de tout usage réel.<br>
-    En cas d'envoi accidentel, on ne vous connaît pas.
+  <!-- PANEL EXCUSES -->
+  <div class="panel" id="panel-excuses">
+    <div class="card">
+      <div class="card-header">🎲 Générer l'excuse du jour</div>
+      <div class="card-body">
+        <div class="field">
+          <label>Catégorie d'excuse</label>
+          <select id="cat-excuse">
+            <option value="technique">📱 Technique (problème de virement/banque)</option>
+            <option value="familiale">👨‍👩‍👧 Familiale (proche malade/décès/naissance)</option>
+            <option value="pro">💼 Professionnelle (licenciement/chômage)</option>
+            <option value="administrative">📋 Administrative (dossier en cours/litige)</option>
+            <option value="cosmique">🌌 Cosmique (force majeure absolue)</option>
+            <option value="creative">🎨 Créative (franchement originale)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Niveau de culot</label>
+          <select id="culot">
+            <option value="1">😇 Classique</option>
+            <option value="2">😏 Audacieux</option>
+            <option value="3">🤡 Stratosphérique</option>
+          </select>
+        </div>
+        <button class="btn-gen" onclick="genExcuse()">🎲 Générer l'excuse</button>
+        <div class="excuse-box" id="result-excuse">
+          <div class="excuse-label">🤡 L'excuse du jour</div>
+          <div class="excuse-text" id="res-excuse"></div>
+          <div class="result-sub">— Vraiment entendue. Ou presque. —</div><br>
+          <button class="btn-copy" onclick="copier('res-excuse')" style="border-color:#FDE68A;color:#B45309;">📋 Copier</button>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <div class="disclaimer">Usage purement thérapeutique. YRAM Recouvrement décline toute responsabilité en cas d'envoi accidentel.<br>Dans ce cas, on ne vous connaît pas.</div>
 
 </div>
 
@@ -134,148 +170,301 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F8F9FB;color:var(--text
 const insultes = {
   fantome: {
     1: [
-      "Monsieur, votre capacité à ignorer nos appels est inversement proportionnelle à votre capacité à ignorer votre dette.",
-      "Votre téléphone semble en bonne santé pour appeler tout le monde sauf nous.",
-      "Nous avons laissé plus de messages que votre opérateur ne peut en stocker. Bravo.",
+      "Votre téléphone fonctionne parfaitement pour tout le monde sauf nous. C'est fascinant techniquement.",
+      "On a laissé plus de messages que votre mère. Et elle vous aime.",
+      "Vous avez vu nos appels. Vous avez choisi de ne pas répondre. On note.",
     ],
     2: [
-      "Vous avez l'art de disparaître plus vite qu'un billet de 50€ dans un portefeuille vide.",
-      "Si l'esquive était un sport olympique, vous seriez médaillé d'or, triple saut, catégorie «créancier».",
-      "Votre messagerie est pleine. Votre compte en banque, apparemment, aussi peu.",
+      "Disparaître de ses dettes, c'est pas comme disparaître d'une photo : ça marche pas.",
+      "Votre messagerie est pleine. Votre honte devrait l'être aussi.",
+      "On a essayé le téléphone, le courrier, le mail, le SMS. Il nous reste l'huissier et on commence à l'apprécier.",
+      "Vous esquivez nos appels avec l'agilité d'un homme qui n'a aucune intention de payer.",
     ],
     3: [
-      "Vous êtes le Houdini du recouvrement. Malheureusement pour vous, on n'est pas magiciens.",
-      "Nous avons contacté votre fantôme plus souvent que vous ne l'avez fait vous-même.",
-      "Invisible aux appels, introuvable aux courriers, mystérieusement absent aux paiements : chapeau l'artiste.",
+      "Vous êtes une honte ambulante avec un solde débiteur. Double performance.",
+      "Même les morts répondent mieux que vous. On a vérifié.",
+      "Vous avez le culot d'être injoignable ET endetté. C'est un talent rare et complètement inutile.",
+      "On ne cherche plus à vous joindre par respect pour nous-mêmes. L'huissier, lui, n'a pas d'amour-propre.",
     ],
   },
   promesse: {
     1: [
-      "«Vendredi c'est sûr» — édition 47. Nous avons hâte de découvrir l'édition 48.",
-      "Votre agenda des promesses est plus chargé que votre compte bancaire.",
-      "Nous collectionnons vos vendredis comme d'autres collectionnent les timbres.",
+      "«Vendredi c'est sûr» — édition 53. On a hâte de voir l'édition 54.",
+      "Votre parole vaut exactement ce que vous avez versé : rien.",
+      "Promettre, c'est facile. Tenir, c'est apparemment votre seul obstacle dans la vie.",
     ],
     2: [
-      "Si les promesses étaient de la monnaie, vous seriez milliardaire. Malheureusement.",
-      "«Je vous rappelle ce soir» — dit l'homme qui n'a jamais rappelé de toute sa vie.",
-      "Vous promettez mieux que vous ne payez, et c'est votre seul vrai talent détecté à ce jour.",
+      "Vous mentez avec une constance qui force le respect, à défaut de forcer le paiement.",
+      "Si chaque promesse rompue était un euro, vous seriez à jour depuis longtemps.",
+      "Vous avez promis 14 fois. Payé zéro fois. Le ratio est éloquent.",
+      "Votre bouche promet, votre banque ricane. L'un des deux a l'honnêteté de ne pas mentir.",
     ],
     3: [
-      "Vos promesses de paiement ont plus de saisons que Derrick. Et autant d'épisodes.",
-      "Vous avez promis tellement de fois qu'on commence à croire que «vendredi» est une divinité que vous priez sans jamais l'atteindre.",
-      "Bravo : vous avez transformé le recouvrement en feuilleton. On attend la saison finale avec impatience.",
+      "Vous êtes la preuve vivante qu'on peut mentir sans rougir, sans vergogne, et sans conséquences à court terme.",
+      "Vos promesses sont des chèques en bois émis par une conscience en faillite.",
+      "On a arrêté de vous croire le jour où vous avez dit «c'est promis». C'était il y a 11 mois.",
+      "Dans une autre vie, vous vendriez des assurances vie à des condamnés à mort.",
     ],
   },
   victime: {
     1: [
-      "L'univers entier semble s'acharner sur vous, sauf l'huissier. Pour l'instant.",
-      "Entre la voiture en panne, la belle-mère hospitalisée et le chien malade, on se demande comment vous trouvez du temps pour dormir.",
-      "Vos malheurs sont réels, mais votre créancier aussi.",
+      "L'univers s'acharne sur vous depuis 8 mois exactement. Quelle coïncidence avec notre première relance.",
+      "Entre la voiture, la belle-mère et le chien, on se demande comment vous trouvez le temps de ne pas payer.",
+      "Vos malheurs sont réels. Notre facture aussi.",
     ],
     2: [
-      "Depuis 8 mois, vous avez eu plus de catastrophes personnelles que dans un roman de Zola.",
-      "Le cosmos vous en veut, certes. Mais nous, on s'en fout du cosmos.",
-      "Si vos dépenses de malchance étaient remboursables, vous nous auriez déjà payé.",
+      "Vous avez eu plus de catastrophes en 6 mois que certains en 60 ans. On applaudit la performance.",
+      "Le cosmos vous en veut personnellement. Mais notre comptabilité, elle, n'a pas de sentiments.",
+      "Votre vie est un désastre continu et pourtant vous dormez, mangez, et ignorez nos appels sans effort.",
+      "Chaque nouvelle excuse est plus créative que la précédente. C'est le seul domaine où vous progressez.",
     ],
     3: [
-      "Job avait moins d'épreuves que vous en 6 mois de relances. Et lui il payait ses dettes.",
-      "Votre vie est un film catastrophe. Le problème, c'est qu'on n'a pas acheté le ticket.",
-      "Vos excuses sont créatives, originales, et parfaitement inutiles à notre comptabilité.",
+      "Job avait des furoncles, perdait ses enfants et ses troupeaux. Il payait quand même ses dettes.",
+      "Si votre vie était un film catastrophe, vous en seriez le réalisateur, le scénariste et le seul spectateur.",
+      "Votre capacité à transformer chaque relance en confession de misère humaine est un don. Malheureusement non monnayable.",
+      "On ne doute pas de votre malheur. On doute juste que ça dure exactement le temps de nos relances.",
     ],
   },
   agressif: {
     1: [
-      "Vous appelez pour vous plaindre avec le même téléphone que vous n'utilisez pas pour payer. Intéressant.",
-      "Votre mécontentement est noté. Votre solde dû, également.",
-      "Vous avez des droits. Votre créancier aussi. C'est merveilleux, non ?",
+      "Vous appelez pour vous plaindre avec le téléphone que vous n'utilisez pas pour nous rappeler. Logique.",
+      "Votre mécontentement est noté. Votre solde dû, aussi. Les deux persistent.",
+      "Être en colère ne réduit pas la dette. On a vérifié à plusieurs reprises.",
     ],
     2: [
-      "Votre agressivité est inversement proportionnelle à votre solvabilité. Observation purement statistique.",
-      "On comprend votre frustration. Elle coûte quand même 1 400€.",
-      "Crier plus fort ne réduit pas la dette. On a vérifié.",
+      "Vous gueuleriez moins fort si vous aviez payé.",
+      "Votre agressivité est inversement proportionnelle à votre solvabilité. C'est mathématique.",
+      "Crier plus fort ne réduit pas la dette. On a recompté. C'est toujours pareil.",
+      "Vous avez une grande gueule et un petit solde. L'équilibre est parfait.",
     ],
     3: [
-      "Vous êtes en colère contre nous pour vous avoir prêté de l'argent que vous n'avez pas rendu. Logique imparable.",
-      "Si l'énergie dépensée à nous insulter était convertie en euros, vous seriez à jour depuis longtemps.",
-      "Votre vocabulaire est riche. Votre compte bancaire, lui, est en déficit.",
+      "Vous avez emprunté de l'argent, vous ne le rendez pas, et vous nous engueul*z par-dessus le marché. Chapeau l'artiste.",
+      "Votre culot est inversement proportionnel à votre honnêteté, et directement proportionnel à votre dette.",
+      "On a entendu des arguments. On a entendu des menaces. Il manque encore 1 400€. Juste ça.",
+      "Vous insultez les gens qui vous ont fait confiance. C'est une belle façon de remercier.",
     ],
   },
   philosophe: {
     1: [
       "Trois ans de contestation. Les philosophes grecs mettaient moins de temps à fonder une école.",
-      "Votre analyse juridique est passionnante. Elle ne règle toujours pas la facture.",
-      "Contester une dette, c'est un droit. La devoir quand même, c'est un fait.",
+      "Votre analyse est passionnante. Elle ne règle toujours pas la facture.",
+      "Contester une dette, c'est un droit. La devoir quand même, c'est un fait têtu.",
     ],
     2: [
-      "Vous avez soulevé 14 points juridiques en 3 ans. Tous fascinants. Tous perdants.",
-      "Descartes doutait de tout, mais il payait ses fournisseurs.",
-      "Votre dossier est le plus documenté qu'on ait jamais vu. Et le moins réglé.",
+      "Vous avez produit plus de papier que votre avocat. Et beaucoup moins de résultats.",
+      "Descartes doutait de tout. Mais lui, il payait ses fournisseurs.",
+      "Votre dossier est le plus documenté qu'on ait. Et le moins réglé. C'est un record.",
+      "Vous contestez avec l'énergie d'un homme innocent et les arguments d'un homme qui doit de l'argent.",
     ],
     3: [
-      "Socrate est mort pour ses idées. Vous, vous devez juste 1 200€.",
-      "Vous avez construit une thèse de 40 pages pour contester une facture de pressing. On admire l'engagement.",
-      "Si le temps passé à contester était facturé, vous nous devriez le double.",
+      "Socrate est mort pour ses idées. Vous, vous devez juste 1 200€. Remettez les choses à l'échelle.",
+      "Vous avez rédigé une thèse de 40 pages pour contester une facture de 380€. Le rapport qualité/effort est remarquable.",
+      "Votre créativité juridique est sans limite. Votre compte en banque, lui, l'est très clairement.",
+      "Kafka aurait pu s'inspirer de votre dossier. Il est à la fois absurde, interminable et impayé.",
     ],
   },
   disparu: {
     1: [
-      "Nouveau numéro, nouvelle adresse, même dette. La continuité dans le changement.",
-      "On ne sait pas qui vous êtes devenu, mais on sait ce que vous devez.",
-      "Votre mobilité géographique est impressionnante. Moins que votre mobilité morale.",
+      "Nouveau numéro, nouvelle adresse, même dette. La dette, elle, ne déménage pas.",
+      "On ne sait pas qui vous êtes devenu. Mais on sait ce que vous devez.",
+      "Changer de numéro ne change pas votre solde. C'est dommage pour vous.",
     ],
     2: [
-      "Vous avez déménagé trois fois en deux ans. La dette, elle, n'a pas bougé.",
-      "Changement de numéro, changement d'adresse, changement de prénom. On cherche encore le changement de comportement.",
-      "En témoins de Jéhovah on renonce parfois. En recouvrement, rarement.",
+      "Vous avez déménagé trois fois. La dette, elle, a votre ancienne adresse ET la nouvelle.",
+      "Changement de vie, changement de numéro, changement de prénom. On cherche encore le changement de comportement.",
+      "Vous vous croyez introuvable. C'est mignon. Vraiment.",
+      "Votre mobilité géographique est impressionnante. Moins que votre immobilité morale.",
     ],
     3: [
-      "Vous avez disparu mieux qu'un suspect dans un polar. Malheureusement, on n'est pas la police, on est plus patients.",
-      "Votre art de la disparition mérite un doctorat. Sauf que les doctorats ça se mérite.",
-      "GPS, détective privé, réseau social, voisins : on a tout essayé sauf l'abandon. On n'abandonne pas.",
+      "Vous avez disparu mieux qu'un témoin sous protection. Malheureusement, on n'est pas la police. On est plus patients.",
+      "GPS, détective, réseaux sociaux, voisins, cousins : on finit toujours par retrouver les gens qui doivent de l'argent. Toujours.",
+      "Vous pensez qu'en changeant de numéro la dette s'efface. C'est touchant comme naïveté.",
+      "Fuir ses dettes, c'est comme fuir son ombre : fatiguant, inutile, et ça finit toujours par vous rattraper.",
     ],
   },
   partiel: {
     1: [
-      "12€ sur 1 400€ — un effort sincère, indéniablement symbolique.",
-      "Merci pour ce virement de 12€. Il nous reste 1 388€ et toute notre vie devant nous.",
-      "Votre bonne volonté se mesure en centimes. C'est mieux que rien. À peine.",
+      "12€ sur 1400€. Un effort sincère, symbolique, et totalement insuffisant.",
+      "Merci pour ce virement de 12€. Il nous reste 1388€ et beaucoup de patience.",
+      "À ce rythme, vous serez à jour vers 2047. On prépare la retraite.",
     ],
     2: [
-      "À ce rythme de remboursement, on finira remboursés vers 2047. On bloque l'agenda.",
-      "5€ ce mois-ci, 8€ le suivant, silence depuis 4 mois. On appelle ça du jazz financier.",
-      "Vous payez par fragments tellement petits qu'on se demande si c'est un virement ou une erreur d'arrondi.",
+      "5€ ce mois, 8€ le suivant, silence depuis 4 mois. On appelle ça du jazz financier.",
+      "Vous payez si peu et si rarement qu'on se demande si c'est un remboursement ou une erreur d'arrondi.",
+      "Votre stratégie de remboursement ressemble à un régime où on perd 50 grammes par an. Théoriquement valable. Pratiquement désespérant.",
+      "Vous nous envoyez de la monnaie pendant que la dette grossit avec les intérêts. C'est presque du génie.",
     ],
     3: [
-      "À votre vitesse de remboursement, la dette sera soldée après votre succession. On contacte déjà vos héritiers par anticipation.",
-      "Votre stratégie de paiement ressemble à un régime où on perd 100 grammes par an. Théoriquement efficace. Pratiquement désespérant.",
-      "Vous payez si peu et si rarement qu'on se demande si c'est une démarche de remboursement ou une performance artistique.",
+      "À votre vitesse, la dette sera soldée après votre succession. On contacte déjà vos héritiers par anticipation.",
+      "Vous payez des miettes sur une dette entière avec le sourire de quelqu'un qui pense s'en sortir. Chapeau le culot.",
+      "12€ sur 1400€, c'est 0,85%. C'est moins que l'inflation. Vous reculez en avançant.",
+      "On a vu des paiements symboliques. Les vôtres sont microscopiques. C'est presque artistique.",
     ],
   },
 };
 
-const emojis = {
-  fantome: '👻', promesse: '🤞', victime: '😭', agressif: '😤', philosophe: '🧐', disparu: '🕵️', partiel: '💸'
+const excuses = {
+  technique: {
+    1: [
+      "Mon virement était parti mais ma banque a eu un bug. Je rappelle lundi.",
+      "J'ai essayé de payer en ligne mais le site n'acceptait pas ma carte. Je règle ça cette semaine.",
+      "Mon application bancaire plante depuis 3 jours. Je vais en agence demain matin.",
+    ],
+    2: [
+      "Ma banque a gelé mon compte suite à une tentative de fraude. Je suis en train de tout débloquer.",
+      "J'ai changé de banque et le virement inter-établissement prend 5 à 7 jours ouvrés. Logique non ?",
+      "Mon conseiller bancaire est en vacances et lui seul peut autoriser les virements de ce montant.",
+      "J'ai fait un virement mais j'ai mis un mauvais RIB. L'argent est quelque part dans le système.",
+    ],
+    3: [
+      "Ma banque a été rachetée et les comptes sont migrés. Tout est bloqué jusqu'à nouvel ordre.",
+      "J'ai payé en crypto mais la conversion en euros prend du temps avec la volatilité actuelle.",
+      "Mon compte a été piraté, la banque enquête, et en attendant tous mes virements sortants sont suspendus.",
+      "Je vous ai envoyé un chèque la semaine dernière. La Poste l'a peut-être perdu. C'est possible.",
+    ],
+  },
+  familiale: {
+    1: [
+      "Mon père est à l'hôpital depuis lundi. Je gère ça dès qu'il va mieux.",
+      "On a eu un décès dans la famille. Je m'occupe de tout ça après les obsèques.",
+      "Ma femme vient d'accoucher. Donnez-moi juste deux semaines.",
+    ],
+    2: [
+      "Mon fils a eu un accident de scooter. Entre les urgences, la paperasse et l'assurance, je n'ai pas eu le temps.",
+      "Ma mère est en EHPAD et j'ai dû avancer sa caution. Je suis à sec momentanément.",
+      "On est en plein divorce. Mon compte joint est bloqué par mon ex et le juge. Situation compliquée.",
+      "Mon beau-père vient de mourir et la succession prend du temps. L'argent arrive.",
+    ],
+    3: [
+      "Mon mari m'a quitté, a vidé le compte commun et est parti au Maroc. Je gère avec ce qu'il reste.",
+      "Je dois m'occuper de ma mère, de mes enfants, et de la succession de mon oncle en même temps. Je suis humain.",
+      "Mon ex a mis le feu à ma voiture. J'ai d'autres priorités ce mois-ci.",
+      "Toute ma famille est tombée malade en même temps. C'est statistiquement improbable mais c'est ce qui s'est passé.",
+    ],
+  },
+  pro: {
+    1: [
+      "J'ai perdu mon travail le mois dernier. J'attends mes allocations chômage.",
+      "Mon entreprise est en redressement judiciaire. Je ne peux plus rien payer sans accord du mandataire.",
+      "J'ai changé de travail et le premier salaire arrive fin du mois.",
+    ],
+    2: [
+      "Mon employeur ne m'a pas encore versé mon salaire. Je suis en litige avec lui aux Prud'hommes.",
+      "J'ai monté ma boîte et les premiers revenus ne sont pas encore là. La trésorerie est tendue.",
+      "Mon client principal me doit 8000€ et ne paie pas. Je suis pris en étau.",
+      "J'ai été licencié pour faute grave contestée. En attendant le jugement, je n'ai rien.",
+    ],
+    3: [
+      "Mon associé est parti avec la caisse. Littéralement. Je porte plainte.",
+      "Mon entreprise vient de fermer et j'attends que la liquidation judiciaire libère mes actifs.",
+      "J'ai investi toutes mes économies dans un projet qui n'a pas abouti. Je repars de zéro.",
+      "Mon patron m'a payé en tickets-restaurant pendant 3 mois. Je me bats avec l'URSSAF.",
+    ],
+  },
+  administrative: {
+    1: [
+      "J'ai un dossier CAF en attente qui bloque tout. Dès que c'est débloqué, je règle.",
+      "Je suis en litige avec mon assurance sur ce même montant. On attend leur réponse.",
+      "Mon dossier de surendettement est en cours. Je ne peux rien payer sans l'accord de la commission.",
+    ],
+    2: [
+      "Je conteste cette facture depuis 6 mois. Mon avocat dit que c'est une erreur de votre part.",
+      "Ma situation est entre les mains d'un notaire suite à une succession. Tout est bloqué.",
+      "J'ai déposé un recours auprès du médiateur. Dans l'attente de sa décision, je ne peux pas payer.",
+      "Mon dossier RSA est en cours de révision et mes droits sont suspendus temporairement.",
+    ],
+    3: [
+      "Je suis sous tutelle depuis peu et mon tuteur doit valider chaque dépense. Il est débordé.",
+      "Je suis en procédure de rétablissement personnel. Mon avocat dit de ne rien payer sans son accord.",
+      "J'ai un créancier prioritaire (les impôts) qui a saisi mon compte. Il ne reste rien.",
+      "Mon dossier est dans les mains de la DGFIP suite à un contrôle fiscal. Tout est gelé jusqu'à l'issue.",
+    ],
+  },
+  cosmique: {
+    1: [
+      "Il y a eu un incendie chez moi. J'ai tout perdu, y compris mon chéquier.",
+      "J'ai été cambriolé la semaine dernière. Carte bancaire, espèces, tout a disparu.",
+      "J'ai eu un accident de voiture grave. Je sors tout juste de l'hôpital.",
+    ],
+    2: [
+      "Une inondation a détruit une partie de mon logement. Je suis à l'hôtel en attendant.",
+      "J'ai eu un AVC il y a 3 semaines. Je me remets doucement. La gestion administrative attendra.",
+      "Ma maison est sous séquestre suite à un litige avec le promoteur. Je n'ai accès à rien.",
+      "J'ai été victime d'une escroquerie en ligne et j'ai perdu l'équivalent de 6 mois de salaire.",
+    ],
+    3: [
+      "Mon ex m'a signalé à la CAF pour fraude, mes prestations ont été coupées du jour au lendemain.",
+      "J'ai fait une dépression sévère suite à un burnout. Hospitalisé 3 semaines. Je reprends le fil.",
+      "Ma voiture a pris feu sur l'autoroute. Tout ce que j'avais dedans a brûlé, y compris mon RIB.",
+      "J'ai été pris dans une catastrophe naturelle à La Réunion. Reconstruction en cours.",
+    ],
+  },
+  creative: {
+    1: [
+      "J'ai confondu votre IBAN avec celui de mon électricien. L'argent est chez EDF.",
+      "Mon fils de 8 ans a accidentellement annulé le virement en jouant sur mon téléphone.",
+      "J'avais mis une alerte dans mon agenda mais elle s'est déclenchée à 3h du matin et je dormais.",
+    ],
+    2: [
+      "J'ai cru que la dette était prescrite. Mon beau-frère qui fait du droit m'avait dit 2 ans.",
+      "J'attendais que vous me rappeliez pour confirmer le montant exact. Vous n'avez pas rappelé.",
+      "J'ai changé de comptable et il n'a pas fait le suivi. Je le tiens responsable.",
+      "Mon médium m'a dit d'attendre la pleine lune pour les décisions financières importantes.",
+    ],
+    3: [
+      "J'ai brûlé votre courrier recommandé en pensant que c'était de la pub. C'est ma femme qui trie.",
+      "Je croyais sincèrement que c'était réglé. J'ai un vague souvenir d'avoir payé il y a longtemps.",
+      "Je pensais que c'était couvert par mon assurance. Laquelle ? Je cherche encore.",
+      "J'ai fait un vœu de non-attachement aux biens matériels. C'est une démarche spirituelle.",
+    ],
+  },
 };
 
-function generer() {
-  const profil = document.getElementById('profil').value;
-  const niveau = document.getElementById('niveau').value;
-  const liste = insultes[profil][niveau];
-  const texte = liste[Math.floor(Math.random() * liste.length)];
-  const box = document.getElementById('result');
-  document.getElementById('res-emoji').textContent = emojis[profil];
-  document.getElementById('res-text').textContent = texte;
-  box.className = 'result-box';
-  void box.offsetWidth;
-  box.className = 'result-box show';
+const emojis_profil = {
+  fantome:'👻', promesse:'🤞', victime:'😭', agressif:'😤', philosophe:'🧐', disparu:'🕵️', partiel:'💸'
+};
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
 }
 
-function copier() {
-  const texte = document.getElementById('res-text').textContent;
+function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function show(boxId) {
+  const box = document.getElementById(boxId);
+  box.className = box.className.replace(' show','').replace('result-box','result-box').replace('excuse-box','excuse-box');
+  void box.offsetWidth;
+  box.classList.add('show');
+}
+
+function genInsulte() {
+  const profil = document.getElementById('profil').value;
+  const niveau = document.getElementById('niveau').value;
+  document.getElementById('res-emoji').textContent = emojis_profil[profil];
+  document.getElementById('res-text').textContent = rand(insultes[profil][niveau]);
+  show('result-insulte');
+}
+
+function genExcuse() {
+  const cat = document.getElementById('cat-excuse').value;
+  const culot = document.getElementById('culot').value;
+  document.getElementById('res-excuse').textContent = rand(excuses[cat][culot]);
+  show('result-excuse');
+}
+
+function copier(id) {
+  const texte = document.getElementById(id).textContent;
   navigator.clipboard.writeText(texte).then(() => {
-    const btn = document.querySelector('.btn-copy');
-    btn.textContent = '✅ Copié (et gardé pour soi)';
-    setTimeout(() => btn.textContent = '📋 Copier (pour rien faire avec)', 2000);
+    const btns = document.querySelectorAll('.btn-copy');
+    btns.forEach(b => {
+      if(b.onclick && b.onclick.toString().includes(id)) {
+        b.textContent = '✅ Copié !';
+        setTimeout(() => b.textContent = '📋 Copier', 2000);
+      }
+    });
   });
 }
 </script>
