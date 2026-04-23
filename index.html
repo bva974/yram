@@ -25,7 +25,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 .hero-sub{font-size:14px;color:#6B7280;max-width:420px;margin:0 auto;line-height:1.7;}
 .hero-redbar{height:3px;width:36px;background:var(--red);margin:1.25rem auto 0;border-radius:2px;}
 
-.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;max-width:700px;margin:2.5rem auto;padding:0 2rem 2.5rem;}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;max-width:960px;margin:2.5rem auto;padding:0 2rem 2.5rem;}
 .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:1.75rem;text-decoration:none;color:var(--text);transition:box-shadow .2s,transform .18s;display:block;position:relative;overflow:hidden;}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
 .card.blue-card::before{background:#1E40AF;}
@@ -42,6 +42,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 .card-link{display:inline-flex;align-items:center;gap:5px;margin-top:1.25rem;font-size:12px;font-weight:700;}
 .card.blue-card .card-link{color:#1E40AF;}
 .card.green-card .card-link{color:#065F46;}
+.badge.defouloir{background:#FFF0F3;color:#9B1D35;}
+.card-icon.defouloir{background:#FFF0F3;}
+.card.defouloir-card::before{background:#9B1D35;}
+.card.defouloir-card .card-link{color:#9B1D35;}
 </style>
 </head>
 <body>
@@ -96,6 +100,19 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
     <div class="card-title">Échéancier</div>
     <div class="card-desc">Calculez et visualisez un tableau d'échéances mensuel, avec premier versement optionnel et export PDF.</div>
     <div class="card-link">Ouvrir
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </div>
+  </a>
+  <a href="insultes.html" class="card defouloir-card">
+    <div class="badge defouloir">Thérapeutique</div>
+    <div class="card-icon defouloir">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9B1D35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
+      </svg>
+    </div>
+    <div class="card-title">Le Défouloir 💢</div>
+    <div class="card-desc">Insultes libératrices et excuses bidons pour les jours difficiles. Usage interne uniquement. Ne jamais envoyer.</div>
+    <div class="card-link">Entrer
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </div>
   </a>
