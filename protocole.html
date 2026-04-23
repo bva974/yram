@@ -279,18 +279,24 @@ function echeancier(total, mens, start, mode){
     d = new Date(d.getFullYear(), d.getMonth()+1, d.getDate());
     n++;
   }
-  // Si la dernière échéance est < 50 €, on la fusionne avec l'avant-dernière
+  // Si la dernière échéance est < 50% d'une échéance normale, on la fusionne avec l'avant-dernière
   if(rows.length >= 2){
     const last = rows[rows.length-1];
-    if(last.montant < 50){
+    const seuil = mens * 0.5;
+    if(last.montant < seuil){
       rows[rows.length-2].montant = Math.round((rows[rows.length-2].montant + last.montant)*100)/100;
       rows[rows.length-2].adjusted = true;
       rows.pop();
-      // Renuméroter
       rows.forEach((r,i) => r.n = i+1);
     }
   }
   if(rows.length>1) rows[rows.length-1].adjusted = rows[rows.length-1].montant !== mens;
+  // Si la dernière échéance est > à la première, on place le montant fort en 1er
+  if(rows.length >= 2 && rows[rows.length-1].montant > rows[0].montant){
+    [rows[0].montant, rows[rows.length-1].montant] = [rows[rows.length-1].montant, rows[0].montant];
+    rows[0].adjusted = true;
+    rows[rows.length-1].adjusted = rows[rows.length-1].montant !== mens;
+  }
   return rows;
 }
 
