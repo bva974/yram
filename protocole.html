@@ -192,6 +192,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F2F5;color:var(--text
           <input id="premier-paiement" type="number" step="0.01" min="0" placeholder="ex: 100.00" oninput="render()">
           <span id="hint-solde" style="font-size:11px;color:#185FA5;font-weight:600;min-height:16px;"></span>
         </div>
+        <div class="field" id="field-date-premier" style="display:none">
+          <label>Date du premier paiement <span style="font-weight:400;color:var(--muted);font-size:10px">— optionnel</span></label>
+          <input id="date-premier" type="date" oninput="render()">
+        </div>
         <input type="hidden" id="objet">
         <div class="field"><label>Référence dossier</label><input id="ref" placeholder="ex: SP-1619-02/2023" oninput="render()"></div>
       </div>
@@ -379,10 +383,13 @@ function render(){
   const solde = montant>0 ? Math.round((montant-(premierPaiement||0))*100)/100 : 0;
 
   const hintSolde = document.getElementById('hint-solde');
+  const fieldDatePremier = document.getElementById('field-date-premier');
   if(montant>0 && premierPaiement>0){
     hintSolde.textContent = `→ Solde à échelonner : ${fmt(solde)}`;
+    fieldDatePremier.style.display = '';
   } else {
     hintSolde.textContent = '';
+    fieldDatePremier.style.display = 'none';
   }
 
   const objet = crNom ? `Facture(s) impayée(s) ${crNom}` : document.getElementById('objet').value.trim();
@@ -398,11 +405,12 @@ function render(){
 
   if(montant>0 && mens>0 && start){
     let allRows = [];
+    const datePremierVal = document.getElementById('date-premier').value;
+    const datePremier = (premierPaiement>0 && datePremierVal) ? datePremierVal : start;
     let firstDate = new Date(start);
     if(premierPaiement>0){
-      allRows.push({n:1, date:new Date(firstDate), montant:premierPaiement, mode, isPremier:true});
-      let nextDate = new Date(firstDate.getFullYear(), firstDate.getMonth()+1, firstDate.getDate());
-      const echRows = echeancier(solde, mens, nextDate.toISOString().slice(0,10), mode);
+      allRows.push({n:1, date:new Date(datePremier), montant:premierPaiement, mode, isPremier:true});
+      const echRows = echeancier(solde, mens, start, mode);
       echRows.forEach((r,i)=>{ r.n=i+2; allRows.push(r); });
     } else {
       allRows = echeancier(montant, mens, start, mode);
@@ -479,6 +487,7 @@ function render(){
 
 rebuildSelect();
 document.getElementById('start-date').value = today();
+document.getElementById('date-premier').value = today();
 setEchMode('mens');
 </script>
 </body>
