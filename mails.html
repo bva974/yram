@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YRAM — Modèles de mails</title>
+<style>
+:root{--red:#D4003F;--navy:#1A1A2E;--border:#E2E8F0;--text:#1A1A2E;--muted:#6B7280;--blue:#1E40AF;--green:#065F46;--orange:#92400E;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#F8F9FB;color:var(--text);font-size:14px;min-height:100vh;}
+.topbar{background:#fff;padding:0 1.5rem;height:50px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--red);}
+.topbar-left{display:flex;align-items:center;gap:16px;}
+.topbar-brand{font-size:13px;font-weight:800;letter-spacing:.12em;color:#111;text-transform:uppercase;}
+.topbar-divider{width:1px;height:18px;background:#E5E7EB;}
+.topbar-sub{font-size:11px;color:#9CA3AF;font-weight:500;}
+.nav{display:flex;gap:0;align-items:center;}
+.nav a{color:#6B7280;text-decoration:none;font-size:11.5px;font-weight:600;padding:6px 14px;transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-2px;}
+.nav a:hover{color:#111;}
+.nav a.active{color:var(--red);border-bottom-color:var(--red);}
+
+.layout{display:flex;height:calc(100vh - 50px);}
+
+/* SIDEBAR */
+.sidebar{width:280px;background:#fff;border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;}
+.search-box{padding:.65rem .75rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:10;}
+.search-box{position:relative;}
+.search-box svg{position:absolute;left:1.35rem;top:50%;transform:translateY(-50%);pointer-events:none;color:#9CA3AF;}
+.search-box input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px 8px 34px;font-size:12px;outline:none;transition:all .15s;background:#F9FAFB;color:var(--text);}
+.search-box input::placeholder{color:#9CA3AF;}
+.search-box input:focus{border-color:var(--red);background:#fff;box-shadow:0 0 0 3px rgba(212,0,63,.07);}
+.cat-block{border-bottom:1px solid var(--border);}
+.cat-header{padding:.5rem .85rem;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;}
+.cat-header:hover{background:#F9FAFB;}
+.cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.cat-count{margin-left:auto;font-size:9px;background:#F3F4F6;color:#6B7280;border-radius:10px;padding:1px 6px;font-weight:700;}
+.cat-items{padding:.25rem 0;}
+.mail-item{padding:.4rem .85rem .4rem 1.6rem;font-size:11.5px;color:#4B5563;cursor:pointer;transition:background .1s;display:flex;align-items:center;gap:6px;border-left:2px solid transparent;}
+.mail-item:hover{background:#F9FAFB;color:#111;}
+.mail-item.active{background:#FFF0F3;color:var(--red);border-left-color:var(--red);font-weight:600;}
+.mail-item .badge{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;flex-shrink:0;}
+.cat-collapse .cat-items{display:none;}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:1.5rem;}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#9CA3AF;gap:.75rem;}
+.empty-state svg{opacity:.3;}
+
+.mail-view{max-width:720px;}
+.mail-header{margin-bottom:1.25rem;}
+.mail-cat-badge{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:4px;margin-bottom:.5rem;}
+.mail-title{font-size:20px;font-weight:800;color:#111;margin-bottom:.5rem;}
+.mail-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.mail-tag{font-size:10px;font-weight:600;background:#F3F4F6;color:#6B7280;border-radius:4px;padding:2px 7px;}
+
+.variants{display:flex;flex-direction:column;gap:1rem;}
+.variant-card{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.variant-header{padding:.5rem 1rem;font-size:10px;font-weight:700;color:#6B7280;background:#F9FAFB;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.variant-label{display:flex;align-items:center;gap:6px;}
+.variant-body{padding:1rem 1.25rem;font-size:13px;line-height:1.75;color:#1A1A2E;white-space:pre-wrap;font-family:'Segoe UI',Arial,sans-serif;}
+.variant-body strong{font-weight:700;color:#111;}
+.btn-copy{font-size:11px;font-weight:700;background:none;border:1px solid var(--border);border-radius:5px;padding:3px 10px;cursor:pointer;color:#6B7280;transition:all .15s;display:flex;align-items:center;gap:4px;}
+.btn-copy:hover{border-color:var(--red);color:var(--red);}
+.btn-copy.copied{border-color:#065F46;color:#065F46;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="index.html" style="text-decoration:none;"><a href="index.html" style="text-decoration:none;"><div class="topbar-brand">YRAM RECOUVREMENT</div></a></a>
+    <div class="topbar-divider"></div>
+    <div class="topbar-sub">Modèles de mails</div>
+  </div>
+  <nav class="nav">
+    <a href="index.html">Accueil</a>
+    <a href="protocole.html">Protocole d'accord</a>
+    <a href="echeancier.html">Échéancier</a>
+    <a href="mails.html" class="active">Mails</a>
+    <a href="insultes.html">Défouloir</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="search-box" style="padding:.65rem .75rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:10;position:sticky;">
+      <svg style="position:absolute;left:1.35rem;top:50%;transform:translateY(-50%);pointer-events:none;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search" placeholder="Rechercher un mail..." oninput="filterMails()" style="width:100%;border:1.5px solid #E2E8F0;border-radius:8px;padding:8px 12px 8px 34px;font-size:12px;outline:none;transition:all .15s;background:#F9FAFB;color:#1A1A2E;" onfocus="this.style.borderColor='#D4003F';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(212,0,63,.07)'" onblur="this.style.borderColor='#E2E8F0';this.style.background='#F9FAFB';this.style.boxShadow='none'">
+    </div>
+    <div id="sidebar-content"></div>
+  </div>
+  <div class="main" id="main">
+    <div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      <div style="font-size:13px;font-weight:600;">Sélectionnez un modèle</div>
+      <div style="font-size:12px;">Choisissez un mail dans la liste à gauche</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║              MODÈLES DE MAILS — AJOUTER / SUPPRIMER             ║
+// ╠══════════════════════════════════════════════════════════════════╣
+// ║  AJOUTER un mail : copier un bloc { ... }, le coller            ║
+// ║  avant le ]; final, changer l'id et remplir les champs.         ║
+// ║                                                                  ║
+// ║  SUPPRIMER un mail : effacer le bloc { id:'...', ... },         ║
+// ║                                                                  ║
+// ║  Chaque mail :                                                   ║
+// ║    id       : identifiant unique (pas d'espace)                  ║
+// ║    title    : titre affiché dans la liste                        ║
+// ║    tags     : mots-clés pour la recherche                        ║
+// ║    variants : tableau de { label, body }                         ║
+// ║               body = texte du mail (utiliser ` ` backticks)      ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+// ── EXEMPLE ──────────────────────────────────────────────────────────
+// {
+//   id: 'mon-mail',
+//   title: 'Mon titre',
+//   tags: ['mot-clé', 'autre-mot'],
+//   variants: [
+//     { label: 'Standard', body: `Bonjour,\n\nCorps du mail.\n\nCordialement,` },
+//   ]
+// },
+
+const MAILS = [
+
+  // ── AUX DÉBITEURS ────────────────────────────────────────────────────
+
+  {
+    id: 'protocole-envoi',
+    title: "Protocole d'accord — Envoi",
+    tags: ['protocole', 'accord', 'échéancier', 'signature'],
+    variants: [
+      { label: 'Envoi', body: `Bonjour,
+
+Un protocole d'accord va vous être envoyé par mail pour signature électronique.
+
+L'échéancier ne sera validé qu'après signature de ce dernier.
+
+Cordialement,` },
+      { label: 'Réception — rappel engagements (v1)', body: `Bonjour,
+
+Votre protocole d'accord signé a bien été réceptionné.
+
+Nous vous rappelons que ce document vaut reconnaissance de dette et engagement ferme de votre part quant au règlement selon l'échéancier convenu.
+
+Aucune tolérance ne sera accordée.
+
+En cas de non-respect d'une seule échéance à sa date :
+- l'intégralité du solde deviendra immédiatement exigible,
+- le protocole sera caduc de plein droit,
+- et le dossier sera transmis pour suites appropriées, sans nouvelle relance.
+
+Nous vous invitons à prendre toutes les dispositions nécessaires afin d'éviter une telle situation.
+
+Cordialement,` },
+      { label: 'Réception — rappel engagements (v2)', body: `Bonjour,
+
+Nous confirmons la réception de votre protocole d'accord signé.
+
+Ce document vaut reconnaissance de dette et engagement ferme et définitif de votre part.
+
+En conséquence, aucun écart ne sera toléré.
+
+Le non-respect d'une seule échéance à sa date entraînera immédiatement et de plein droit :
+- l'exigibilité de l'intégralité du solde restant dû,
+- la caducité du protocole,
+- et la transmission de votre dossier pour mise en œuvre de suites adaptées, sans nouvelle mise en demeure ni délai supplémentaire.
+
+Cordialement,` },
+      { label: 'Non-respect — Protocole caduc (v1)', body: `Bonjour,
+
+Nous constatons le non-respect de votre protocole d'accord, notamment par le défaut de règlement de l'échéance convenue à sa date.
+
+En application des termes du protocole que vous avez signé, celui-ci est désormais caduc de plein droit.
+
+En conséquence :
+- l'intégralité du solde restant dû devient immédiatement exigible,
+- la suspension des démarches de recouvrement prend fin sans délai.
+
+Votre dossier est transmis pour mise en œuvre des suites appropriées.
+
+Aucune nouvelle relance ni délai supplémentaire ne sera accordé.
+
+Cordialement,` },
+      { label: 'Non-respect — Protocole caduc (v2)', body: `Bonjour,
+
+Malgré votre engagement formalisé par la signature du protocole d'accord, nous constatons le non-respect de vos obligations.
+
+Cette défaillance entraîne de plein droit :
+- la caducité immédiate du protocole,
+- l'exigibilité intégrale et immédiate du solde restant dû,
+- la reprise des démarches de recouvrement.
+
+Aucun échéancier ne sera désormais accordé. Aucune tolérance ne sera appliquée.
+
+Toute régularisation devra intervenir sans délai sur la totalité des sommes dues.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'justif-paiement',
+    title: 'Demande de justificatif de paiement',
+    tags: ['justificatif', 'paiement', 'preuve'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Vous indiquez avoir réglé votre dette auprès de votre créancier.
+
+Afin de pouvoir traiter votre réclamation, nous vous invitons à nous transmettre un justificatif attestant de ce paiement.
+
+À défaut de réception d'un justificatif, votre réclamation ne pourra pas être prise en compte et la procédure se poursuivra normalement.
+
+Dans l'attente de votre retour.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'justif-resiliation',
+    title: 'Demande de justificatif de résiliation',
+    tags: ['justificatif', 'résiliation', 'contrat'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Vous indiquez avoir sollicité la résiliation de votre contrat auprès de votre créancier.
+
+Afin de pouvoir traiter votre réclamation, nous vous invitons à nous transmettre un justificatif attestant de cette demande de résiliation.
+
+À défaut de réception d'un justificatif, votre réclamation ne pourra pas être prise en compte et la procédure se poursuivra normalement.
+
+Dans l'attente de votre retour.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'justif-echeancier',
+    title: "Demande de justificatif d'échéancier",
+    tags: ['justificatif', 'échéancier', 'créancier'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Vous nous avez indiqué avoir mis en place un échéancier directement avec votre créancier.
+
+Afin de pouvoir traiter votre réclamation, nous vous remercions de bien vouloir nous transmettre un justificatif.
+
+À défaut de réception de ce document, votre dossier restera inchangé et la procédure se poursuivra.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'justif-reclamation',
+    title: 'Demande de justificatif de réclamation',
+    tags: ['justificatif', 'réclamation', 'Runeo', 'Dioneo'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Vous nous indiquez avoir transmis des éléments à votre créancier.
+
+Afin de pouvoir traiter votre réclamation, nous vous remercions de bien vouloir nous communiquer une copie des démarches effectuées (courrier, formulaire, accusé de réception, etc.).
+
+Pour déposer votre réclamation, vous pouvez utiliser le lien correspondant à votre service gestionnaire :
+- RUNEO : https://www.runeo.re/nous-contacter
+- DIONEO : https://dioneo.re/nous-contacter
+- Eaux de La Possession : https://www.eauxdelapossession.re/nous-contacter
+
+Dans l'attente, la dette demeure exigible et la procédure suit son cours.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'justif-cession',
+    title: 'Demande de certificat de cession',
+    tags: ['justificatif', 'cession', 'véhicule', 'vente'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Vous nous indiquez avoir vendu le véhicule concerné par l'impayé.
+
+Afin de pouvoir examiner votre réclamation, nous vous remercions de bien vouloir nous transmettre le certificat de cession du véhicule.
+
+À défaut de réception de ce justificatif, votre réclamation ne pourra pas être traitée et la procédure de recouvrement se poursuivra.
+
+Dans l'attente de votre retour.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'justif-revenus',
+    title: 'Demande de justificatif de revenus',
+    tags: ['justificatif', 'revenus', 'salaire', 'CAF', 'échéancier'],
+    variants: [
+      { label: 'Étude de la proposition', body: `Bonjour,
+
+Afin d'étudier votre proposition d'échéancier, nous vous remercions de bien vouloir nous transmettre un justificatif de vos revenus (dernier bulletin de salaire, attestation CAF, avis de situation Pôle emploi, etc.).
+
+Dans l'attente de votre retour,
+
+Cordialement,` },
+      { label: 'Proposition insuffisante', body: `Bonjour,
+
+Votre proposition d'échéancier n'est pas suffisante au regard du montant de votre dette.
+
+Afin d'étudier votre demande, nous vous remercions de bien vouloir nous transmettre un justificatif de revenus (dernier bulletin de salaire, attestation CAF, avis de situation Pôle emploi, etc.).
+
+Dans l'attente de votre retour,
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'justif-demenagement',
+    title: 'Demande de justificatif de déménagement',
+    tags: ['justificatif', 'déménagement', 'état des lieux', 'index', 'EDF', 'Runeo', 'Allianz'],
+    variants: [
+      { label: 'EDF', body: `Bonjour,
+
+Vous nous indiquez avoir quitté le logement concerné par la facture EDF impayée.
+
+Afin de traiter votre réclamation, merci de bien vouloir nous transmettre un état des lieux de sortie comportant les index du compteur EDF.
+
+Pouvez-vous également nous confirmer si cet état des lieux a été transmis à EDF lors de votre changement d'adresse ?
+
+Dans l'attente de votre retour,
+
+Cordialement,` },
+      { label: 'Runeo', body: `Bonjour,
+
+Vous nous indiquez avoir quitté le logement concerné par la facture RUNEO impayée.
+
+Afin de pouvoir examiner votre réclamation, merci de bien vouloir nous transmettre l'état des lieux de sortie comportant les index du compteur d'eau.
+
+Dans l'attente de votre retour,
+
+Cordialement,` },
+      { label: 'Allianz', body: `Bonjour,
+
+Vous nous indiquez avoir quitté le logement concerné par la facture ALLIANZ impayée.
+
+Afin de pouvoir examiner votre réclamation, merci de bien vouloir nous transmettre votre état des lieux de sortie.
+
+Dans l'attente de votre retour,
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'justif-surendettement',
+    title: 'Demande de justificatif de surendettement',
+    tags: ['justificatif', 'surendettement', 'Banque de France', 'recevabilité'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Vous indiquez que la dette ferait partie d'un dossier de surendettement déclaré recevable.
+
+À ce jour, aucune notification officielle de la Banque de France ne nous a été transmise.
+
+Afin de mettre à jour votre dossier, merci de bien vouloir nous communiquer la décision de recevabilité ou tout document émanant de la Banque de France.
+
+En l'absence de justificatif, la procédure suit son cours.
+
+Dans l'attente de votre transmission,
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'paiement-non-recu',
+    title: 'Paiement non reçu',
+    tags: ['paiement', 'virement', 'non reçu', 'justificatif'],
+    variants: [
+      { label: 'Générique', body: `Bonjour,
+
+Vous nous avez indiqué avoir procédé au règlement de votre dette par virement bancaire.
+
+Après vérification auprès du créancier, aucun paiement correspondant n'a été identifié à ce jour.
+
+Afin de permettre la localisation éventuelle de votre virement, merci de bien vouloir nous transmettre :
+- le RIB du compte destinataire que vous avez utilisé,
+- ainsi que le relevé de compte où apparaît l'opération (une capture d'écran n'est pas suffisante).
+
+Dans l'attente de ces justificatifs, la procédure suit son cours.
+
+Cordialement,` },
+      { label: 'EDF', body: `Bonjour,
+
+Vous nous avez indiqué avoir procédé au règlement de votre dette envers EDF.
+
+Après vérification auprès du créancier, aucun paiement correspondant n'a été identifié à ce jour.
+
+Merci de bien vouloir nous transmettre un justificatif de paiement.
+
+Dans l'attente, la procédure suit son cours.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'paiement-nouvelle-adresse',
+    title: 'Paiement effectué sur nouvelle adresse',
+    tags: ['paiement', 'adresse', 'ancienne adresse', 'EDF'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Après vérification de votre dossier, le paiement effectué concerne votre nouvelle adresse.
+
+Vous demeurez en revanche redevable d'une somme au titre de votre ancienne adresse.
+
+Nous vous remercions de bien vouloir contacter nos services au 0262 910 950 afin de procéder à la régularisation de votre situation.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'paiement-cheque-energie',
+    title: 'Paiement par chèque énergie',
+    tags: ['paiement', 'chèque énergie', 'EDF'],
+    variants: [
+      { label: 'Débiteur', body: `Bonjour,
+
+Afin de pouvoir procéder au traitement et à l'encaissement de votre chèque énergie, nous vous remercions de bien vouloir nous transmettre :
+
+- Une copie de votre chèque énergie, avec la zone à gratter (partie droite) déjà révélée ;
+- Une facture récente afin de valider l'imputation du paiement.
+
+Sans ces documents, nous ne serons pas en mesure de traiter votre demande.
+
+Dans l'attente de votre retour.
+
+Cordialement,` },
+      { label: 'Client (vérification)', body: `Bonjour,
+
+Le client mentionné dans l'objet nous indique avoir bénéficié d'un chèque énergie.
+
+Pouvez-vous nous confirmer si ce paiement a bien été reçu et imputé sur son compte ?
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'echeancier-trop-faible',
+    title: 'Échéancier trop faible',
+    tags: ['échéancier', 'insuffisant', 'montant', 'mensualité'],
+    variants: [
+      { label: 'Proposition initiale insuffisante', body: `Bonjour,
+
+Nous vous informons que le montant proposé est largement insuffisant au regard du montant total de votre dette et ne permet pas d'envisager une régularisation effective du dossier.
+
+Nous vous invitons à revoir le montant de vos échéances à la hausse et à nous proposer sans délai un plan de règlement adapté.
+
+À défaut de proposition conforme, la procédure se poursuivra.
+
+Cordialement,` },
+      { label: 'Paiement reçu mais insuffisant', body: `Bonjour,
+
+Nous confirmons avoir bien reçu votre paiement.
+
+Toutefois, le montant versé est insuffisant au regard du solde de votre dette.
+
+Il sera donc nécessaire d'augmenter le montant des échéances.
+
+Merci de nous transmettre une proposition de règlement révisée.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'pas-date-paiement',
+    title: 'Pas de date précise de paiement',
+    tags: ['paiement', 'date', 'relance', 'procédure'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+À défaut de communication d'une date précise de paiement, la procédure se poursuivra, avec l'ensemble des conséquences juridiques qui peuvent en découler.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'pas-concerne-dette',
+    title: 'Je ne suis pas concerné par la dette',
+    tags: ['contestation', 'identité', 'homonymie', 'erreur'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Après vérification, le contrat concerné est bien établi à votre nom, ce qui justifie la prise de contact de notre part.
+
+Si vous estimez qu'il s'agit d'une erreur, nous vous invitons à nous transmettre tout document permettant de contester votre implication (pièce d'identité, justificatif d'homonymie, attestation de non-souscription, etc.).
+
+À défaut de contestation sérieuse et étayée, la procédure de recouvrement se poursuivra.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'detail-dette',
+    title: 'Demande de détail de la dette',
+    tags: ['détail', 'dette', 'facture', 'décompte', 'contestation'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+L'ensemble des informations que vous sollicitez vous ont été communiquées par courrier recommandé avec accusé de réception, lequel constitue une notification régulière.
+
+À ce jour, aucun élément nouveau ni justificatif valable n'est venu modifier les informations déjà portées à votre connaissance.
+
+En l'état, et en l'absence de contestation sérieuse et étayée, la procédure de recouvrement suit son cours.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'hors-departement',
+    title: 'Hors département',
+    tags: ['hors département', 'distance', 'virement', 'paiement en ligne'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Le fait d'être hors du département ne constitue pas un motif légitime pour expliquer l'absence de règlement. Les paiements peuvent être effectués à distance.
+
+Nous prenons toutefois note de votre intention de régulariser. Merci de procéder sans délai au règlement par virement ou par carte bancaire, et de nous en confirmer l'exécution.
+
+À défaut de paiement effectif, la procédure se poursuivra.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'resiliation-nouveau-locataire',
+    title: 'Résiliation par nouveau locataire',
+    tags: ['résiliation', 'locataire', 'Runeo', 'contrat'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Nous vous rappelons que la gestion du contrat et sa résiliation relèvent exclusivement de la responsabilité du titulaire du contrat, et non de celle du nouveau locataire.
+
+Il vous appartient donc de procéder vous-même à la résiliation ou à la mise à jour de votre contrat auprès de RUNEO.
+
+En l'état, la facture impayée demeure due à votre nom.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'resiliation-hors-delais',
+    title: 'Résiliation hors délais',
+    tags: ['résiliation', 'délais', 'contentieux', 'impayé'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Nous accusons réception de votre courrier de résiliation.
+
+Nous vous informons que cette demande est postérieure à la résiliation contentieuse du contrat, intervenue pour impayé.
+
+Dans ce contexte, la prise en compte d'une résiliation à votre initiative relève exclusivement de la décision du créancier.
+
+La procédure de recouvrement n'est pas suspendue à ce stade. Votre demande a été transmise au créancier pour examen.
+
+Dans l'attente, la dette demeure exigible.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'impayes-avant-resiliation',
+    title: 'Impayés antérieurs à la résiliation',
+    tags: ['résiliation', 'impayés', 'téléphonie', 'antérieur'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Vous nous avez indiqué avoir procédé à la résiliation de votre contrat de téléphonie mobile.
+
+Nous vous précisons toutefois que des impayés étaient déjà présents avant la date de résiliation. À ce titre, la somme réclamée demeure exigible.
+
+Vous trouverez en pièce jointe votre relevé de compte récapitulant les sommes dues.
+
+Nous vous invitons à contacter nos services au 02 62 91 09 50 afin de régulariser votre situation.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'connexion-debiteur',
+    title: 'Connexion espace débiteur',
+    tags: ['connexion', 'espace débiteur', 'yram.fr', 'paiement en ligne'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Pour vous identifier et effectuer votre paiement en ligne, merci de suivre le processus suivant :
+
+1. Vous rendre sur le site https://yram.fr
+2. Cliquer sur ESPACE DEBITEUR
+3. Cliquer sur "J'accède à mon compte pour la première fois"
+
+Veuillez entrer les éléments suivants :
+1. Référence DÉBITEUR : DB_________
+2. Référence DOSSIER : SP-_________
+
+En cas de souci, n'hésitez pas à contacter notre service au 02 62 910 950.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'depot-iedom',
+    title: 'Dépôt IEDOM',
+    tags: ['IEDOM', 'surendettement', 'dépôt', 'commission'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Nous prenons acte de la transmission de votre justificatif de dépôt d'un dossier de surendettement auprès de l'IEDOM.
+
+Toutefois, nous vous rappelons que tant que la commission n'a pas rendu de décision, vous demeurez pleinement redevable des sommes dues.
+
+Nous vous invitons à poursuivre vos règlements ou à prendre attache avec nos services afin de convenir d'une solution.
+
+À défaut, les démarches de recouvrement se poursuivront.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'communication-facture',
+    title: 'Communication de la facture',
+    tags: ['facture', 'document', 'pièce jointe'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Suite à votre réclamation, vous trouverez en pièces jointes la ou les facture(s) demeurant impayée(s) à ce jour.
+
+Nous vous invitons à prendre contact avec nos services au 0262 91 09 50, ou par retour de mail, afin d'organiser la régularisation de votre situation.
+
+À défaut de régularisation ou de retour de votre part, la procédure de recouvrement se poursuivra.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'aucune-reclamation-runeo',
+    title: 'Aucune réclamation reçue par Runeo',
+    tags: ['réclamation', 'Runeo', 'Dioneo', "tout-à-l'égout", 'raccordement'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Vous nous avez indiqué ne pas être raccordable au tout-à-l'égout.
+
+Après vérification, votre créancier nous confirme qu'aucune réclamation relative à cette situation n'a été enregistrée auprès de ses services.
+
+Il vous appartient donc d'effectuer cette démarche sans délai, faute de quoi la procédure de recouvrement se poursuivra.
+
+Pour déposer votre réclamation :
+- RUNEO : https://www.runeo.re/nous-contacter
+- DIONEO : https://dioneo.re/nous-contacter
+- Eaux de La Possession : https://www.eauxdelapossession.re/nous-contacter
+
+Dans l'attente, la dette demeure exigible.
+
+Cordialement,` },
+    ]
+  },
+
+  // ── AUX CLIENTS ─────────────────────────────────────────────────────────
+
+  {
+    id: 'paiement-chez-client',
+    title: 'Paiement effectué chez le créancier',
+    tags: ['paiement', 'créancier', 'confirmation', 'justificatif'],
+    variants: [
+      { label: 'Avec détails', body: `Bonjour,
+
+Le client cité en objet nous indique avoir réglé sa dette auprès de vos services.
+
+- Justificatif : NON
+- Montant réglé : _____ €
+- Mode de paiement : _____
+- Date de paiement : _____
+
+Confirmez-vous ses dires ?
+
+Cordialement,` },
+      { label: 'Sans justificatif', body: `Bonjour,
+
+Le client cité en objet nous indique avoir réglé sa dette auprès de vos services.
+
+Il ne nous a pas communiqué de justificatif.
+
+Confirmez-vous ses dires ?
+
+Cordialement,` },
+      { label: 'EN — sans justificatif', body: `Dear Sir / Madam,
+
+The client referenced in the subject line informed us that they have settled their debt with your services.
+However, no supporting document has been provided to us.
+
+Could you please confirm whether this is correct?
+
+Best regards,` },
+    ]
+  },
+
+  {
+    id: 'demande-facture-client',
+    title: 'Demande de facture au créancier',
+    tags: ['facture', 'créancier', 'document'],
+    variants: [
+      { label: 'FR', body: `Bonjour,
+
+Pouvez-vous me communiquer la facture du client cité en objet ?
+
+Cordialement,` },
+      { label: 'EN', body: `Dear Sir / Madam,
+
+Could you please send me the invoice for the client mentioned in the subject line?
+
+Best regards,` },
+    ]
+  },
+
+  {
+    id: 'resiliation-contrat-client',
+    title: 'Résiliation contrat — vérification créancier',
+    tags: ['résiliation', 'contrat', 'créancier', 'confirmation'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Le débiteur nous indique avoir sollicité la résiliation de son contrat.
+
+Pouvez-vous nous confirmer si, au regard de cette résiliation, la créance demeure exigible et doit être maintenue en recouvrement ?
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'adresse-incomplete',
+    title: 'Adresse incomplète',
+    tags: ['adresse', 'coordonnées', 'appartement'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+L'adresse du client est incomplète, il manque le numéro d'appartement.
+
+Auriez-vous cette information ?
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'reparation-fuite',
+    title: 'Réparation fuite — dégrèvement',
+    tags: ['fuite', 'dégrèvement', 'Runeo', 'eau', 'plombier'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Le client nous indique qu'une fuite serait à l'origine de la facture concernée.
+Il précise que la fuite a été réparée et que la facture du plombier vous a été transmise.
+
+Pouvez-vous nous confirmer si la dette demeure due en totalité ou si un dégrèvement a été appliqué ?` },
+    ]
+  },
+
+  {
+    id: 'raccordement-egout',
+    title: "Raccordement tout-à-l'égout",
+    tags: ["tout-à-l'égout", 'raccordement', 'Runeo', 'consommations'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Le client nous indique ne pas être raccordable au tout-à-l'égout.
+
+Il aurait déjà effectué plusieurs réclamations à vos services.
+
+Pouvez-vous me communiquer la facture pour la partie "consommations" ?
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'demande-contrat-assurance',
+    title: 'Demande de copie du contrat',
+    tags: ['contrat', 'assurance', 'souscription', 'copie'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Pouvez-vous me communiquer une copie du contrat signé ?
+
+En effet, le client nous indique n'avoir jamais souscrit au contrat en objet.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'demande-cotisation',
+    title: "Demande d'appel de cotisation",
+    tags: ['cotisation', 'assurance', 'appel'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Pouvez-vous me communiquer l'appel de cotisation du client cité en objet ?
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'vente-vehicule-client',
+    title: 'Vente véhicule — vérification dette',
+    tags: ['véhicule', 'vente', 'assurance', 'dette'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Le client nous indique avoir vendu son véhicule (cf. PJ).
+
+La dette est-elle bien due ?
+
+Cordialement,` },
+      { label: 'Disparition du risque', body: `Bonjour,
+
+Le client mentionné en objet nous informe que le risque a disparu à la suite de la vente de ce dernier.
+
+Vous trouverez en pièce jointe le justificatif de vente.
+
+La dette est-elle bien exigible ?
+
+Cordialement,` },
+    ]
+  },
+
+  // ── GÉNÉRAUX ────────────────────────────────────────────────────────────
+
+  {
+    id: 'derniere-chance',
+    title: 'Dernière chance de paiement',
+    tags: ['relance', 'mise en demeure', 'tribunal', 'urgence', 'ultime'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Malgré nos multiples relances restées sans effet, le règlement de la facture citée en objet nous est toujours impayé.
+
+À ce jour, et dans un dernier geste avant de saisir le tribunal compétent, nous vous mettons en demeure de régulariser votre situation dans les 8 jours.
+
+Vous pouvez effectuer votre paiement de manière immédiate et sécurisée via :
+1. Notre plateforme en ligne : yram.fr — Identifiant : SP-_________
+2. Par téléphone au 02 62 910 950 pour un paiement par carte bancaire.
+
+Passé ce délai, des procédures juridiques seront engagées sans autre avertissement.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'demande-echeancier',
+    title: "Demande d'échéancier",
+    tags: ['échéancier', 'facilités', 'paiement', 'mensualité'],
+    variants: [
+      { label: 'Demande des éléments', body: `Madame, Monsieur,
+
+Nous avons bien pris en compte votre situation et sommes en mesure de vous accorder des facilités de paiement.
+
+Afin de finaliser cette proposition, nous vous remercions de bien vouloir nous indiquer :
+
+1. Le montant mensuel souhaité (maximum 5 échéances) ;
+2. La date du premier paiement ;
+3. Le mode de paiement privilégié (CB, virement, chèque ou espèces) ;
+4. Votre numéro de mobile/fixe.
+
+Cordialement,` },
+      { label: 'Confirmation de date', body: `Bonjour,
+
+Nous prenons note de votre date de paiement. Cette dernière devra être scrupuleusement respectée.
+
+Veuillez nous confirmer :
+- Le mode de paiement privilégié (CB, virement, chèque ou espèces).
+- Votre numéro de mobile/fixe.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'attestation-fin-paiement',
+    title: 'Attestation de fin de paiement',
+    tags: ['attestation', 'clôture', 'fin', 'paiement', 'solde'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Veuillez trouver ci-joint votre attestation de fin de paiement concernant votre dossier.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'confirmation-date-paiement',
+    title: 'Confirmation de date de paiement',
+    tags: ['confirmation', 'paiement', 'date', 'instance'],
+    variants: [
+      { label: 'Prise de note simple', body: `Bonjour,
+
+Nous accusons réception de votre email et attendons donc votre paiement le ___/___/_______.
+
+Cordialement,` },
+      { label: 'Validation du plan', body: `Objet : Validation de votre plan de paiement
+
+Bonjour,
+
+Votre proposition d'échéancier est notée, sous réserve du strict respect de la date du premier paiement.
+
+Pour finaliser cet accord, merci de nous contacter au 02 62 910 950 le jour du 1er paiement et de nous fournir par retour mail :
+
+1. La date du premier paiement ;
+2. Le mode de paiement privilégié (CB, virement, chèque ou espèces) ;
+3. Votre numéro de mobile/fixe.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'demande-preuve-resiliation',
+    title: 'Demande de preuve de résiliation',
+    tags: ['résiliation', 'preuve', 'justificatif', 'clôture', 'dossier'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Afin de régulariser la situation, je vous serais reconnaissant de bien vouloir me fournir une preuve de résiliation du contrat concerné. Cette démarche est nécessaire pour clôturer définitivement ce dossier dans nos registres.
+
+Je vous remercie de me faire parvenir ce document dès que possible, par retour d'email.
+
+Dans l'attente de votre retour.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'justif-paiement-general',
+    title: 'Demande de justificatif de paiement — clôture',
+    tags: ['justificatif', 'paiement', 'clôture', 'registre'],
+    variants: [
+      { label: 'Clôture dossier', body: `Bonjour,
+
+Merci de bien vouloir nous faire parvenir un justificatif qui atteste du règlement de cette créance.
+
+Cette démarche est nécessaire pour clôturer définitivement ce dossier dans nos registres.
+
+Cordialement,` },
+      { label: 'Mise à jour dossier', body: `Bonjour,
+
+Merci de bien vouloir nous faire parvenir un justificatif qui atteste du règlement de cette somme. À réception, nous nous rapprocherons de notre client et mettrons à jour votre dossier.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'mise-a-jour-coordonnees',
+    title: 'Mise à jour des coordonnées',
+    tags: ['coordonnées', 'téléphone', 'adresse', 'mail', 'mise à jour'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Afin de mettre à jour votre dossier, merci de bien vouloir me confirmer :
+
+- votre numéro de téléphone ;
+- votre adresse mail ;
+- votre adresse postale.
+
+Dans l'attente de votre retour.` },
+    ]
+  },
+
+  {
+    id: 'paiement-virement',
+    title: 'Paiement par virement — coordonnées bancaires',
+    tags: ['virement', 'IBAN', 'RIB', 'paiement', 'coordonnées bancaires'],
+    variants: [
+      { label: 'Standard', body: `Madame, Monsieur,
+
+Pour effectuer le règlement de votre dossier, veuillez trouver ci-dessous les informations nécessaires :
+
+- IBAN : FR76 1990 6009 7430 0229 1401 082 (RIB joint à ce mail)
+- Montant total à régler : _____ €
+- Échéance mensuelle : _____ €
+
+Important : Merci d'indiquer en objet de votre virement votre numéro de dossier SP- afin que nous puissions traiter votre paiement rapidement.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'prise-contact-nouveaux-clients',
+    title: 'Prise de contact nouveaux clients',
+    tags: ['commercial', 'présentation', 'nouveaux clients', 'convention', 'honoraires'],
+    variants: [
+      { label: 'Standard', body: `Nous vous remercions chaleureusement d'avoir pris contact avec nos services.
+
+Notre méthode de travail :
+
+· Un site internet est à votre disposition pour le suivi de vos dossiers, télécharger les certificats d'irrécouvrabilité ainsi que vos factures d'honoraires et listings des reversements.
+
+· Reversement des sommes récupérées mensuellement (avant le 10 de chaque mois)
+
+· Règlement des factures à 30 jours ou par compensation au choix
+
+· Transmission des dossiers par e-mail ou sur notre site internet
+
+· Respect des directives RGPD
+
+· Des agents terrain se déplacent à domicile pour trouver une solution amiable
+
+· Possibilité de traitement des dossiers à Mayotte
+
+· Notre cabinet regroupe une quinzaine de personnes (gestionnaires / agents terrain)
+
+· Possibilité de traitement pré-judiciaire des dossiers (injonction de payer)
+
+Nos honoraires débutent à partir de 20% sur les sommes récupérées (aucun frais de dossier supplémentaire).
+
+Une souplesse tarifaire est offerte pour des volumes mensuels importants.
+
+Je vous laisse prendre soin de nous contacter par retour e-mail si nos conditions vous conviennent, je vous enverrai notre convention.
+
+Excellente journée à vous.` },
+    ]
+  },
+
+  // ── JURIDIQUES ───────────────────────────────────────────────────────────
+
+  {
+    id: 'obligation-assurer-vehicule',
+    title: "Obligation d'assurer une voiture en panne",
+    tags: ['assurance', 'véhicule', 'L211-1', 'panne', 'obligation'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Je me permets de vous rappeler qu'un véhicule, même en panne ou immobilisé, reste soumis à l'obligation d'assurance.
+
+En effet, l'article L211-1 du Code des assurances impose que tout véhicule terrestre à moteur soit couvert par une assurance garantissant au minimum la responsabilité civile, même si le véhicule ne roule pas.
+
+En l'état, la dette reste donc due.
+
+Il conviendra de la régulariser en contactant nos services au 02 62 910 950.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'responsabilite-cessation-contrat',
+    title: "Responsabilité jusqu'à cessation de contrat",
+    tags: ['résiliation', 'EDF', 'contrat', 'facturation', 'art.1217'],
+    variants: [
+      { label: 'Standard', body: `Madame, Monsieur,
+
+Nous vous rappelons que, conformément aux Conditions Générales de Vente d'EDF, un contrat d'électricité reste actif et facturable tant qu'aucune demande de résiliation formelle n'a été effectuée par le titulaire du contrat.
+
+Par conséquent, tant que vous ne notifiez pas explicitement votre volonté de mettre fin au contrat, celui-ci continue de produire ses effets, indépendamment du fait que vous occupiez physiquement le logement ou non.
+
+En tant que titulaire du contrat, vous êtes responsable des consommations enregistrées jusqu'à la date effective de résiliation (article 1217 du Code civil).
+
+En l'état, la dette est bien due.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'arret-utilisation-abonnement',
+    title: "Explication facture — arrêt utilisation des services",
+    tags: ['abonnement', 'résiliation', 'facturation', 'arrêt', 'utilisation'],
+    variants: [
+      { label: 'Standard', body: `Bonjour Madame, Monsieur,
+
+L'arrêt de l'utilisation de votre abonnement n'entraîne pas automatiquement sa résiliation.
+
+En l'absence de demande de résiliation formelle, le contrat reste actif et les sommes dues continuent de s'accumuler conformément à vos engagements contractuels.
+
+Restant à votre disposition pour toute précision complémentaire.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'paiement-total-prime',
+    title: "Paiement total de la prime (pas uniquement l'impayé)",
+    tags: ['assurance', 'prime', 'L113-3', 'L113-4', 'totalité', 'résiliation'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Je vous confirme que l'intégralité des sommes restant dues au titre de vos différentes polices est exigible, et pas uniquement les primes impayées.
+
+En effet, conformément aux articles L.113-3 et L.113-4 du Code des assurances, le non-paiement des primes entraîne la suspension des garanties, puis la résiliation du contrat.
+
+Toutefois, cette résiliation n'éteint pas la dette : les primes correspondant à la période déjà entamée restent entièrement dues.
+
+Le règlement doit porter sur le montant total dû, sans exception.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'client-doit-assurer-paiement',
+    title: "Le client doit s'assurer du paiement",
+    tags: ['assurance', 'L113-3', 'prime', 'responsabilité', 'Prudence Créole'],
+    variants: [
+      { label: 'Standard', body: `Madame, Monsieur,
+
+Après vérification de votre dossier, nous vous confirmons que l'intégralité de la prime d'assurance reste due.
+
+Il appartient à l'assuré de s'assurer du paiement effectif de sa prime, même lorsque l'incident de paiement résulte d'une erreur d'un tiers (art. L113-3 du Code des assurances).
+
+Vous avez été informé de l'impayé par courrier recommandé avec avis de réception, ce qui régularise pleinement la procédure de relance.
+
+Le contrat a été résilié pour non-paiement. Cette résiliation n'efface pas la dette.
+
+En conséquence, la procédure de recouvrement se poursuit.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'paiement-minimum-malgre-aide',
+    title: 'Demande de paiement minimum malgré aide en cours',
+    tags: ['aide', 'paiement partiel', 'RSA', 'CAF', 'attente'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Dans l'attente de la réponse à vos demandes d'aides, nous vous invitons à effectuer des paiements partiels.
+
+En effet, il est possible qu'aucune aide ne vous soit accordée ou que celle-ci ne couvre qu'une partie de votre dette. Un paiement minimal reste attendu afin de témoigner de votre volonté de régulariser.
+
+Merci de bien vouloir nous indiquer une date à laquelle vous envisagez de procéder à un premier règlement.
+
+Dans l'attente de votre retour.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'justif-echeancier-etendu',
+    title: 'Demande justificatifs — échéancier étendu (+10 échéances)',
+    tags: ['échéancier', 'justificatifs', 'revenus', 'charges', 'art.1104', 'étendu'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Dans le cadre de votre demande de règlement en plus de dix échéances, nous vous remercions de bien vouloir nous transmettre des justificatifs de votre situation financière :
+
+- un état de vos revenus (bulletins de salaire, avis d'imposition, etc.) ;
+- un état de vos charges (loyer, crédits en cours, charges fixes, etc.).
+
+Cette demande s'inscrit dans le respect du principe de bonne foi contractuelle prévu à l'article 1104 du Code civil.
+
+Dans l'attente de votre retour.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'contestation-paiement',
+    title: 'Réponse — Contestation de paiement',
+    tags: ['contestation', 'paiement', 'preuve', 'justificatif'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Vous nous avez informés avoir réglé directement auprès de votre créancier.
+
+Toutefois, nous confirmons qu'aucun paiement de votre part n'a été enregistré.
+
+Il est impératif de nous fournir une preuve de paiement sans délai.
+
+En l'absence de ce justificatif, la procédure en cours se poursuivra.
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'prorata-vente-vehicule',
+    title: 'Prorata vente véhicule — Allianz',
+    tags: ['Allianz', 'véhicule', 'prorata', 'résiliation', 'vente'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Vous nous avez indiqué avoir vendu votre véhicule.
+
+À titre exceptionnel et commercial, votre assureur Allianz accepte de traiter votre demande de résiliation au-delà des délais légaux.
+
+Vous restez redevable d'une somme correspondant à la période de couverture jusqu'à la date de vente de votre véhicule.
+
+Nous vous invitons à contacter nos services au 0262 910 950 afin de procéder à la régularisation.
+
+Cordialement,` },
+    ]
+  },
+
+];
+
+// ── MOTEUR DE RECHERCHE ET AFFICHAGE ──────────────────────────────────────
+
+let currentId = null;
+
+const RED = '#D4003F';
+
+function buildSidebar(filter) {
+  const container = document.getElementById('sidebar-content');
+  container.innerHTML = '';
+  const words = filter ? filter.toLowerCase().trim().split(/\s+/).filter(Boolean) : [];
+
+  const filtered = MAILS.filter(m => {
+    if (!words.length) return true;
+    const haystack = [m.title, ...m.tags, ...m.variants.map(v => v.body)].join(' ').toLowerCase();
+    return words.every(w => haystack.includes(w));
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = '<div style="padding:2rem 1rem;text-align:center;font-size:12px;color:#9CA3AF;">Aucun résultat</div>';
+    return;
+  }
+
+  filtered.forEach(m => {
+    const item = document.createElement('div');
+    item.className = 'mail-item' + (m.id === currentId ? ' active' : '');
+    if (m.id === currentId) {
+      item.style.borderLeftColor = RED;
+      item.style.background = '#FFF0F3';
+    }
+    item.dataset.id = m.id;
+
+    let title = m.title;
+    words.forEach(w => {
+      const re = new RegExp('(' + w.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&') + ')', 'gi');
+      title = title.replace(re, '<mark style="background:#FFF0A0;border-radius:2px;padding:0 1px;">$1</mark>');
+    });
+
+    item.innerHTML = `<span style="flex:1;min-width:0;">${title}</span>${m.variants.length > 1 ? `<span class="badge" style="background:#FFF0F3;color:${RED}">${m.variants.length}</span>` : ''}`;
+    item.style.display = 'flex';
+    item.style.alignItems = 'center';
+    item.style.gap = '6px';
+    item.onclick = () => openMail(m.id);
+    container.appendChild(item);
+  });
+}
+
+function openMail(id) {
+  currentId = id;
+  const mail = MAILS.find(m => m.id === id);
+  if (!mail) return;
+  buildSidebar(document.getElementById('search').value);
+
+  const variantsHtml = mail.variants.map((v, i) => `
+    <div class="variant-card">
+      <div class="variant-header">
+        <div class="variant-label">
+          ${mail.variants.length > 1 ? `<span style="font-size:10px;font-weight:800;background:#FFF0F3;color:${RED};border-radius:4px;padding:2px 7px;">Variante ${i + 1}</span>` : '<span style="color:#9CA3AF">Mail type</span>'}
+          <span style="color:#9CA3AF">${v.label}</span>
+        </div>
+        <button class="btn-copy" onclick="copyVariant(${i},'${id}')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copier
+        </button>
+      </div>
+      <div class="variant-body">${escHtml(v.body)}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('main').innerHTML = `
+    <div class="mail-view">
+      <div class="mail-header">
+        <div class="mail-title">${mail.title}</div>
+        <div class="mail-meta">${mail.tags.map(t => `<span class="mail-tag">${t}</span>`).join('')}</div>
+      </div>
+      <div class="variants">${variantsHtml}</div>
+    </div>
+  `;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+
+function copyVariant(varIdx, mailId) {
+  const mail = MAILS.find(m => m.id === mailId);
+  if (!mail) return;
+  navigator.clipboard.writeText(mail.variants[varIdx].body).then(() => {
+    const btn = event.currentTarget;
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copié !`;
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copier`;
+    }, 2000);
+  });
+}
+
+function filterMails() {
+  buildSidebar(document.getElementById('search').value);
+}
+
+buildSidebar();
+</script>
+</body>
+</html>
