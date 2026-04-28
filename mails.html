@@ -422,7 +422,7 @@ Afin de permettre la localisation éventuelle de votre virement, merci de bien v
 Dans l'attente de ces justificatifs, la procédure suit son cours.
 
 Cordialement,` },
-      { label: 'Créancier spécifique', body: `Bonjour,
+      { label: 'Créancier spécifique', edited: '28/04/2025', body: `Bonjour,
 
 Vous nous avez indiqué avoir procédé au règlement de votre dette envers {{CREANCIER}}.
 
@@ -953,7 +953,7 @@ Cordialement,` },
     title: "Demande d'échéancier",
     tags: ['échéancier', 'facilités', 'paiement', 'mensualité'],
     variants: [
-      { label: 'Demande des éléments', body: `Madame, Monsieur,
+      { label: 'Demande des éléments', edited: '28/04/2025', body: `Madame, Monsieur,
 
 Votre dette s'élève à ce jour à un montant de {{MONTANT}} €.
 
@@ -966,7 +966,7 @@ Afin de finaliser cette proposition, nous vous remercions de bien vouloir nous i
 - Le mode de paiement privilégié (CB, virement, chèque ou espèces).
 
 Cordialement,` },
-      { label: 'Générique', body: `Madame, Monsieur,
+      { label: 'Générique', edited: '28/04/2025', body: `Madame, Monsieur,
 
 Nous avons bien pris en compte votre situation et sommes en mesure de vous accorder des facilités de paiement.
 
@@ -975,15 +975,6 @@ Afin de finaliser cette proposition, nous vous remercions de bien vouloir nous i
 - Le montant mensuel souhaité ;
 - La date du premier paiement ;
 - Le mode de paiement privilégié (CB, virement, chèque ou espèces).
-
-Cordialement,` },
-      { label: 'Confirmation de date', body: `Bonjour,
-
-Nous prenons note de votre date de paiement. Cette dernière devra être scrupuleusement respectée.
-
-Veuillez nous confirmer :
-- Le mode de paiement privilégié (CB, virement, chèque ou espèces).
-- Votre numéro de mobile/fixe.
 
 Cordialement,` },
     ]
@@ -1403,6 +1394,7 @@ function openMail(id) {
         <div class="variant-label">
           ${mail.variants.length > 1 ? `<span style="font-size:10px;font-weight:800;background:#FFF0F3;color:${RED};border-radius:4px;padding:2px 7px;">Variante ${i + 1}</span>` : '<span style="color:#9CA3AF">Mail type</span>'}
           <span style="color:#9CA3AF">${v.label}</span>
+          ${v.edited ? `<span style="font-size:10px;font-weight:700;background:#ECFDF5;color:#065F46;border:1px solid #6EE7B7;border-radius:4px;padding:2px 8px;">✓ Modifié le ${v.edited}</span>` : ''}
         </div>
         <button class="btn-copy" onclick="copyVariant(${i},'${id}')">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
@@ -1417,7 +1409,9 @@ function openMail(id) {
     <div class="mail-view">
       <div class="mail-header">
         <div class="mail-title">${mail.title}</div>
-        <div class="mail-meta">${mail.tags.map(t => `<span class="mail-tag">${t}</span>`).join('')}</div>
+        <div class="mail-meta">
+          ${mail.tags.map(t => `<span class="mail-tag">${t}</span>`).join('')}
+        </div>
       </div>
       <div class="variants">${variantsHtml}</div>
     </div>
