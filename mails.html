@@ -95,6 +95,11 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F4F8;color:var(--text
       <svg style="position:absolute;left:1.35rem;top:50%;transform:translateY(-50%);pointer-events:none;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="search" placeholder="Rechercher un mail..." oninput="filterMails()" style="width:100%;border:1.5px solid #E2E8F0;border-radius:8px;padding:8px 12px 8px 34px;font-size:12px;outline:none;transition:all .15s;background:#F9FAFB;color:#1A1A2E;" onfocus="this.style.borderColor='#D4003F';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(212,0,63,.07)'" onblur="this.style.borderColor='#E2E8F0';this.style.background='#F9FAFB';this.style.boxShadow='none'">
     </div>
+    <div style="display:flex;border-bottom:1px solid var(--border);background:#fff;position:sticky;top:49px;z-index:9;">
+      <button id="filter-all" onclick="setFilter('all')" style="flex:1;padding:7px 4px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border:none;cursor:pointer;border-bottom:2px solid #D4003F;color:#D4003F;background:#fff;transition:all .15s;">Tous</button>
+      <button id="filter-debiteur" onclick="setFilter('debiteur')" style="flex:1;padding:7px 4px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:none;cursor:pointer;border-bottom:2px solid transparent;color:#6B7280;background:#fff;transition:all .15s;">Débiteur</button>
+      <button id="filter-creancier" onclick="setFilter('creancier')" style="flex:1;padding:7px 4px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:none;cursor:pointer;border-bottom:2px solid transparent;color:#6B7280;background:#fff;transition:all .15s;">Créancier</button>
+    </div>
     <div id="sidebar-content"></div>
   </div>
   <div class="main" id="main">
@@ -139,6 +144,7 @@ const MAILS = [
 
   {
     id: 'protocole-envoi',
+    cat: 'debiteur',
     title: "Protocole d'accord — Envoi",
     tags: ['protocole', 'accord', 'échéancier', 'signature'],
     variants: [
@@ -213,6 +219,7 @@ Cordialement,` },
 
   {
     id: 'justif-paiement',
+    cat: 'debiteur',
     title: 'Demande de justificatif de paiement',
     tags: ['justificatif', 'paiement', 'preuve'],
     variants: [
@@ -232,6 +239,7 @@ Cordialement,` },
 
   {
     id: 'justif-resiliation',
+    cat: 'debiteur',
     title: 'Demande de justificatif de résiliation',
     tags: ['justificatif', 'résiliation', 'contrat'],
     variants: [
@@ -251,6 +259,7 @@ Cordialement,` },
 
   {
     id: 'justif-echeancier',
+    cat: 'debiteur',
     title: "Demande de justificatif d'échéancier",
     tags: ['justificatif', 'échéancier', 'créancier'],
     variants: [
@@ -268,6 +277,7 @@ Cordialement,` },
 
   {
     id: 'justif-reclamation',
+    cat: 'debiteur',
     title: 'Demande de justificatif de réclamation',
     tags: ['justificatif', 'réclamation', 'Runeo', 'Dioneo'],
     variants: [
@@ -290,6 +300,7 @@ Cordialement,` },
 
   {
     id: 'justif-cession',
+    cat: 'debiteur',
     title: 'Demande de certificat de cession',
     tags: ['justificatif', 'cession', 'véhicule', 'vente'],
     variants: [
@@ -309,6 +320,7 @@ Cordialement,` },
 
   {
     id: 'justif-revenus',
+    cat: 'debiteur',
     title: 'Demande de justificatif de revenus',
     tags: ['justificatif', 'revenus', 'salaire', 'CAF', 'échéancier'],
     variants: [
@@ -333,6 +345,7 @@ Cordialement,` },
 
   {
     id: 'justif-demenagement',
+    cat: 'debiteur',
     title: 'Demande de justificatif de déménagement',
     tags: ['justificatif', 'déménagement', 'état des lieux', 'index', 'EDF', 'Runeo', 'Allianz'],
     variants: [
@@ -370,6 +383,7 @@ Cordialement,` },
 
   {
     id: 'justif-surendettement',
+    cat: 'debiteur',
     title: 'Demande de justificatif de surendettement',
     tags: ['justificatif', 'surendettement', 'Banque de France', 'recevabilité'],
     variants: [
@@ -391,6 +405,7 @@ Cordialement,` },
 
   {
     id: 'paiement-non-recu',
+    cat: 'debiteur',
     title: 'Paiement non reçu',
     tags: ['paiement', 'virement', 'non reçu', 'justificatif'],
     variants: [
@@ -423,6 +438,7 @@ Cordialement,` },
 
   {
     id: 'paiement-nouvelle-adresse',
+    cat: 'debiteur',
     title: 'Paiement effectué sur nouvelle adresse',
     tags: ['paiement', 'adresse', 'ancienne adresse', 'EDF'],
     variants: [
@@ -440,6 +456,7 @@ Cordialement,` },
 
   {
     id: 'paiement-cheque-energie',
+    cat: 'debiteur',
     title: 'Paiement par chèque énergie',
     tags: ['paiement', 'chèque énergie', 'EDF'],
     variants: [
@@ -467,6 +484,7 @@ Cordialement,` },
 
   {
     id: 'echeancier-trop-faible',
+    cat: 'debiteur',
     title: 'Échéancier trop faible',
     tags: ['échéancier', 'insuffisant', 'montant', 'mensualité'],
     variants: [
@@ -495,6 +513,7 @@ Cordialement,` },
 
   {
     id: 'pas-date-paiement',
+    cat: 'debiteur',
     title: 'Pas de date précise de paiement',
     tags: ['paiement', 'date', 'relance', 'procédure'],
     variants: [
@@ -508,6 +527,7 @@ Cordialement,` },
 
   {
     id: 'pas-concerne-dette',
+    cat: 'debiteur',
     title: 'Je ne suis pas concerné par la dette',
     tags: ['contestation', 'identité', 'homonymie', 'erreur'],
     variants: [
@@ -525,6 +545,7 @@ Cordialement,` },
 
   {
     id: 'detail-dette',
+    cat: 'debiteur',
     title: 'Demande de détail de la dette',
     tags: ['détail', 'dette', 'facture', 'décompte', 'contestation'],
     variants: [
@@ -542,6 +563,7 @@ Cordialement,` },
 
   {
     id: 'hors-departement',
+    cat: 'debiteur',
     title: 'Hors département',
     tags: ['hors département', 'distance', 'virement', 'paiement en ligne'],
     variants: [
@@ -570,6 +592,7 @@ Cordialement,` },
 
   {
     id: 'resiliation-nouveau-locataire',
+    cat: 'debiteur',
     title: 'Résiliation par nouveau locataire',
     tags: ['résiliation', 'locataire', 'Runeo', 'contrat'],
     variants: [
@@ -587,6 +610,7 @@ Cordialement,` },
 
   {
     id: 'resiliation-hors-delais',
+    cat: 'debiteur',
     title: 'Résiliation hors délais',
     tags: ['résiliation', 'délais', 'contentieux', 'impayé'],
     variants: [
@@ -608,6 +632,7 @@ Cordialement,` },
 
   {
     id: 'impayes-avant-resiliation',
+    cat: 'debiteur',
     title: 'Impayés antérieurs à la résiliation',
     tags: ['résiliation', 'impayés', 'téléphonie', 'antérieur'],
     variants: [
@@ -627,6 +652,7 @@ Cordialement,` },
 
   {
     id: 'connexion-debiteur',
+    cat: 'debiteur',
     title: 'Connexion espace débiteur',
     tags: ['connexion', 'espace débiteur', 'yram.fr', 'paiement en ligne'],
     variants: [
@@ -650,6 +676,7 @@ Cordialement,` },
 
   {
     id: 'depot-iedom',
+    cat: 'debiteur',
     title: 'Dépôt IEDOM',
     tags: ['IEDOM', 'surendettement', 'dépôt', 'commission'],
     variants: [
@@ -669,6 +696,7 @@ Cordialement,` },
 
   {
     id: 'communication-facture',
+    cat: 'debiteur',
     title: 'Communication de la facture',
     tags: ['facture', 'document', 'pièce jointe'],
     variants: [
@@ -686,6 +714,7 @@ Cordialement,` },
 
   {
     id: 'aucune-reclamation-runeo',
+    cat: 'debiteur',
     title: 'Aucune réclamation reçue par Runeo',
     tags: ['réclamation', 'Runeo', 'Dioneo', "tout-à-l'égout", 'raccordement'],
     variants: [
@@ -712,6 +741,7 @@ Cordialement,` },
 
   {
     id: 'paiement-chez-client',
+    cat: 'creancier',
     title: 'Paiement effectué chez le créancier',
     tags: ['paiement', 'créancier', 'confirmation', 'justificatif'],
     variants: [
@@ -719,19 +749,10 @@ Cordialement,` },
 
 Le client cité en objet nous indique avoir réglé sa dette auprès de vos services.
 
-- Justificatif : NON
-- Montant réglé : _____ €
-- Mode de paiement : _____
-- Date de paiement : _____
-
-Confirmez-vous ses dires ?
-
-Cordialement,` },
-      { label: 'Sans justificatif', body: `Bonjour,
-
-Le client cité en objet nous indique avoir réglé sa dette auprès de vos services.
-
-Il ne nous a pas communiqué de justificatif.
+- Justificatif : {{YESNO:JUSTIFICATIF}}
+- Montant réglé : {{MONTANT}} €
+- Mode de paiement : {{MODE_DE_PAIEMENT}}
+- Date de paiement : {{DATE_DE_PAIEMENT}}
 
 Confirmez-vous ses dires ?
 
@@ -749,6 +770,7 @@ Best regards,` },
 
   {
     id: 'demande-facture-client',
+    cat: 'creancier',
     title: 'Demande de facture au créancier',
     tags: ['facture', 'créancier', 'document'],
     variants: [
@@ -767,6 +789,7 @@ Best regards,` },
 
   {
     id: 'resiliation-contrat-client',
+    cat: 'creancier',
     title: 'Résiliation contrat — vérification créancier',
     tags: ['résiliation', 'contrat', 'créancier', 'confirmation'],
     variants: [
@@ -782,6 +805,7 @@ Cordialement,` },
 
   {
     id: 'adresse-incomplete',
+    cat: 'creancier',
     title: 'Adresse incomplète',
     tags: ['adresse', 'coordonnées', 'appartement'],
     variants: [
@@ -797,6 +821,7 @@ Cordialement,` },
 
   {
     id: 'reparation-fuite',
+    cat: 'creancier',
     title: 'Réparation fuite — dégrèvement',
     tags: ['fuite', 'dégrèvement', 'Runeo', 'eau', 'plombier'],
     variants: [
@@ -811,6 +836,7 @@ Pouvez-vous nous confirmer si la dette demeure due en totalité ou si un dégrè
 
   {
     id: 'raccordement-egout',
+    cat: 'creancier',
     title: "Raccordement tout-à-l'égout",
     tags: ["tout-à-l'égout", 'raccordement', 'Runeo', 'consommations'],
     variants: [
@@ -828,6 +854,7 @@ Cordialement,` },
 
   {
     id: 'demande-contrat-assurance',
+    cat: 'creancier',
     title: 'Demande de copie du contrat',
     tags: ['contrat', 'assurance', 'souscription', 'copie'],
     variants: [
@@ -843,6 +870,7 @@ Cordialement,` },
 
   {
     id: 'demande-cotisation',
+    cat: 'creancier',
     title: "Demande d'appel de cotisation",
     tags: ['cotisation', 'assurance', 'appel'],
     variants: [
@@ -856,6 +884,7 @@ Cordialement,` },
 
   {
     id: 'vente-vehicule-client',
+    cat: 'creancier',
     title: 'Vente véhicule — vérification dette',
     tags: ['véhicule', 'vente', 'assurance', 'dette'],
     variants: [
@@ -880,6 +909,7 @@ Cordialement,` },
 
   {
     id: 'ccas-aide-percue',
+    cat: 'creancier',
     title: 'Vérification aide CCAS',
     tags: ['CCAS', 'aide', 'sociale', 'client', 'vérification'],
     variants: [
@@ -897,6 +927,7 @@ Cordialement,` },
 
   {
     id: 'derniere-chance',
+    cat: 'debiteur',
     title: 'Dernière chance de paiement',
     tags: ['relance', 'mise en demeure', 'tribunal', 'urgence', 'ultime'],
     variants: [
@@ -918,6 +949,7 @@ Cordialement,` },
 
   {
     id: 'demande-echeancier',
+    cat: 'debiteur',
     title: "Demande d'échéancier",
     tags: ['échéancier', 'facilités', 'paiement', 'mensualité'],
     variants: [
@@ -947,6 +979,7 @@ Cordialement,` },
 
   {
     id: 'attestation-fin-paiement',
+    cat: 'debiteur',
     title: 'Attestation de fin de paiement',
     tags: ['attestation', 'clôture', 'fin', 'paiement', 'solde'],
     variants: [
@@ -960,6 +993,7 @@ Cordialement,` },
 
   {
     id: 'confirmation-date-paiement',
+    cat: 'debiteur',
     title: 'Confirmation de date de paiement',
     tags: ['confirmation', 'paiement', 'date', 'instance'],
     variants: [
@@ -986,6 +1020,7 @@ Cordialement,` },
 
   {
     id: 'demande-preuve-resiliation',
+    cat: 'debiteur',
     title: 'Demande de preuve de résiliation',
     tags: ['résiliation', 'preuve', 'justificatif', 'clôture', 'dossier'],
     variants: [
@@ -1003,6 +1038,7 @@ Cordialement,` },
 
   {
     id: 'justif-paiement-general',
+    cat: 'debiteur',
     title: 'Demande de justificatif de paiement — clôture',
     tags: ['justificatif', 'paiement', 'clôture', 'registre'],
     variants: [
@@ -1023,6 +1059,7 @@ Cordialement,` },
 
   {
     id: 'mise-a-jour-coordonnees',
+    cat: 'debiteur',
     title: 'Mise à jour des coordonnées',
     tags: ['coordonnées', 'téléphone', 'adresse', 'mail', 'mise à jour'],
     variants: [
@@ -1040,6 +1077,7 @@ Dans l'attente de votre retour.` },
 
   {
     id: 'paiement-virement',
+    cat: 'debiteur',
     title: 'Paiement par virement — coordonnées bancaires',
     tags: ['virement', 'IBAN', 'RIB', 'paiement', 'coordonnées bancaires'],
     variants: [
@@ -1059,6 +1097,7 @@ Cordialement,` },
 
   {
     id: 'prise-contact-nouveaux-clients',
+    cat: 'creancier',
     title: 'Prise de contact nouveaux clients',
     tags: ['commercial', 'présentation', 'nouveaux clients', 'convention', 'honoraires'],
     variants: [
@@ -1098,6 +1137,7 @@ Excellente journée à vous.` },
 
   {
     id: 'obligation-assurer-vehicule',
+    cat: 'debiteur',
     title: "Obligation d'assurer une voiture en panne",
     tags: ['assurance', 'véhicule', 'L211-1', 'panne', 'obligation'],
     variants: [
@@ -1117,6 +1157,7 @@ Cordialement,` },
 
   {
     id: 'responsabilite-cessation-contrat',
+    cat: 'debiteur',
     title: "Responsabilité jusqu'à cessation de contrat",
     tags: ['résiliation', 'EDF', 'contrat', 'facturation', 'art.1217'],
     variants: [
@@ -1136,6 +1177,7 @@ Cordialement,` },
 
   {
     id: 'arret-utilisation-abonnement',
+    cat: 'debiteur',
     title: "Explication facture — arrêt utilisation des services",
     tags: ['abonnement', 'résiliation', 'facturation', 'arrêt', 'utilisation'],
     variants: [
@@ -1153,6 +1195,7 @@ Cordialement,` },
 
   {
     id: 'paiement-total-prime',
+    cat: 'debiteur',
     title: "Paiement total de la prime (pas uniquement l'impayé)",
     tags: ['assurance', 'prime', 'L113-3', 'L113-4', 'totalité', 'résiliation'],
     variants: [
@@ -1172,6 +1215,7 @@ Cordialement,` },
 
   {
     id: 'client-doit-assurer-paiement',
+    cat: 'debiteur',
     title: "Le client doit s'assurer du paiement",
     tags: ['assurance', 'L113-3', 'prime', 'responsabilité', 'Prudence Créole'],
     variants: [
@@ -1193,6 +1237,7 @@ Cordialement,` },
 
   {
     id: 'paiement-minimum-malgre-aide',
+    cat: 'debiteur',
     title: 'Demande de paiement minimum malgré aide en cours',
     tags: ['aide', 'paiement partiel', 'RSA', 'CAF', 'attente'],
     variants: [
@@ -1212,6 +1257,7 @@ Cordialement,` },
 
   {
     id: 'justif-echeancier-etendu',
+    cat: 'debiteur',
     title: 'Demande justificatifs — échéancier étendu (+10 échéances)',
     tags: ['échéancier', 'justificatifs', 'revenus', 'charges', 'art.1104', 'étendu'],
     variants: [
@@ -1232,6 +1278,7 @@ Cordialement,` },
 
   {
     id: 'contestation-paiement',
+    cat: 'debiteur',
     title: 'Réponse — Contestation de paiement',
     tags: ['contestation', 'paiement', 'preuve', 'justificatif'],
     variants: [
@@ -1251,6 +1298,7 @@ Cordialement,` },
 
   {
     id: 'prorata-vente-vehicule',
+    cat: 'debiteur',
     title: 'Prorata vente véhicule — Allianz',
     tags: ['Allianz', 'véhicule', 'prorata', 'résiliation', 'vente'],
     variants: [
@@ -1273,8 +1321,21 @@ Cordialement,` },
 // ── MOTEUR DE RECHERCHE ET AFFICHAGE ──────────────────────────────────────
 
 let currentId = null;
+let activeFilter = 'all';
 
 const RED = '#D4003F';
+
+function setFilter(f) {
+  activeFilter = f;
+  ['all', 'debiteur', 'creancier'].forEach(k => {
+    const btn = document.getElementById('filter-' + k);
+    if (!btn) return;
+    btn.style.borderBottom = k === f ? `2px solid ${RED}` : '2px solid transparent';
+    btn.style.color = k === f ? RED : '#6B7280';
+    btn.style.fontWeight = k === f ? '800' : '700';
+  });
+  buildSidebar(document.getElementById('search').value);
+}
 
 function buildSidebar(filter) {
   const container = document.getElementById('sidebar-content');
@@ -1282,6 +1343,7 @@ function buildSidebar(filter) {
   const words = filter ? filter.toLowerCase().trim().split(/\s+/).filter(Boolean) : [];
 
   const filtered = MAILS.filter(m => {
+    if (activeFilter !== 'all' && m.cat !== activeFilter) return false;
     if (!words.length) return true;
     const haystack = [m.title, ...m.tags, ...m.variants.map(v => v.body)].join(' ').toLowerCase();
     return words.every(w => haystack.includes(w));
@@ -1320,7 +1382,8 @@ function openMail(id) {
   currentId = id;
   const mail = MAILS.find(m => m.id === id);
   if (!mail) return;
-  buildSidebar(document.getElementById('search').value);
+  if (mail.cat && mail.cat !== activeFilter) setFilter(mail.cat);
+  else buildSidebar(document.getElementById('search').value);
 
   const variantsHtml = mail.variants.map((v, i) => `
     <div class="variant-card">
@@ -1353,9 +1416,21 @@ function escHtml(s, varIdx, mailId) {
   let out = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   if (varIdx !== undefined && mailId !== undefined) {
+    // Tokens OUI/NON : {{YESNO:NOM}}
+    out = out.replace(/\{\{YESNO:([A-Z0-9_]+)\}\}/g, (match, token) => {
+      const idY = `tok-${mailId}-${varIdx}-YESNO_${token}_OUI`;
+      const idN = `tok-${mailId}-${varIdx}-YESNO_${token}_NON`;
+      return `<span style="display:inline-flex;align-items:center;gap:10px;vertical-align:middle;">` +
+        `<label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-size:13px;font-weight:700;color:var(--red);">` +
+        `<input type="radio" id="${idN}" name="tok-${mailId}-${varIdx}-${token}" value="NON" checked style="accent-color:var(--red);" /> NON</label>` +
+        `<label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-size:13px;font-weight:700;color:var(--red);">` +
+        `<input type="radio" id="${idY}" name="tok-${mailId}-${varIdx}-${token}" value="OUI" style="accent-color:var(--red);" /> OUI</label>` +
+        `</span>`;
+    });
+    // Tokens texte : {{NOM}}
     out = out.replace(/\{\{([A-Z0-9_]+)\}\}/g, (match, token) => {
       const id = `tok-${mailId}-${varIdx}-${token}`;
-      const label = token.replace(/_/g, ' ');
+      const label = token.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
       return `<input type="text" id="${id}" class="token-input" data-token="${token}" placeholder="${label}" style="display:inline-block;border:none;border-bottom:2px solid var(--red);background:#FFF0F3;color:var(--red);font-weight:700;font-size:13px;font-family:inherit;padding:0 4px 1px;min-width:80px;outline:none;border-radius:2px 2px 0 0;" />`;
     });
   }
@@ -1366,6 +1441,12 @@ function copyVariant(varIdx, mailId) {
   const mail = MAILS.find(m => m.id === mailId);
   if (!mail) return;
   let body = mail.variants[varIdx].body;
+  // Substituer les tokens YESNO
+  body = body.replace(/\{\{YESNO:([A-Z0-9_]+)\}\}/g, (match, token) => {
+    const selected = document.querySelector(`input[name="tok-${mailId}-${varIdx}-${token}"]:checked`);
+    return selected ? selected.value : match;
+  });
+  // Substituer les tokens texte
   body = body.replace(/\{\{([A-Z0-9_]+)\}\}/g, (match, token) => {
     const input = document.getElementById(`tok-${mailId}-${varIdx}-${token}`);
     return (input && input.value.trim()) ? input.value.trim() : match;
