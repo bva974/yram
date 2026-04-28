@@ -955,14 +955,26 @@ Cordialement,` },
     variants: [
       { label: 'Demande des éléments', body: `Madame, Monsieur,
 
+Votre dette s'élève à ce jour à un montant de {{MONTANT}} €.
+
+Nous avons bien pris en compte votre situation et sommes en mesure de vous accorder des facilités de paiement (maximum {{NB_ECHEANCES}} échéances, soit environ {{CALC:MONTANT/NB_ECHEANCES}} € / mois).
+
+Afin de finaliser cette proposition, nous vous remercions de bien vouloir nous indiquer :
+
+- Le montant mensuel souhaité ;
+- La date du premier paiement ;
+- Le mode de paiement privilégié (CB, virement, chèque ou espèces).
+
+Cordialement,` },
+      { label: 'Générique', body: `Madame, Monsieur,
+
 Nous avons bien pris en compte votre situation et sommes en mesure de vous accorder des facilités de paiement.
 
 Afin de finaliser cette proposition, nous vous remercions de bien vouloir nous indiquer :
 
-1. Le montant mensuel souhaité (maximum 5 échéances) ;
-2. La date du premier paiement ;
-3. Le mode de paiement privilégié (CB, virement, chèque ou espèces) ;
-4. Votre numéro de mobile/fixe.
+- Le montant mensuel souhaité ;
+- La date du premier paiement ;
+- Le mode de paiement privilégié (CB, virement, chèque ou espèces).
 
 Cordialement,` },
       { label: 'Confirmation de date', body: `Bonjour,
@@ -1427,6 +1439,37 @@ function escHtml(s, varIdx, mailId) {
         `<input type="radio" id="${idY}" name="tok-${mailId}-${varIdx}-${token}" value="OUI" style="accent-color:var(--red);" /> OUI</label>` +
         `</span>`;
     });
+    // Tokens CALC : {{CALC:TOKEN_A/TOKEN_B}} — calcul dynamique A/B arrondi au supérieur
+    out = out.replace(/\{\{CALC:([A-Z0-9_]+)\/([A-Z0-9_]+)\}\}/g, (match, tokA, tokB) => {
+      const idA = `tok-${mailId}-${varIdx}-${tokA}`;
+      const idB = `tok-${mailId}-${varIdx}-${tokB}`;
+      const idResult = `calc-${mailId}-${varIdx}-${tokA}_${tokB}`;
+      setTimeout(() => {
+        const inputA = document.getElementById(idA);
+        const inputB = document.getElementById(idB);
+        const result = document.getElementById(idResult);
+        if (!inputA || !inputB || !result) return;
+        function recalc() {
+          const a = parseFloat(String(inputA.value).replace(',', '.'));
+          const b = parseFloat(String(inputB.value).replace(',', '.'));
+          if (a > 0 && b > 0) {
+            result.textContent = Math.ceil(a / b).toLocaleString('fr-FR');
+            result.style.color = '#065F46';
+            result.style.background = '#ECFDF5';
+            result.style.borderBottomColor = '#6EE7B7';
+          } else {
+            result.textContent = '?';
+            result.style.color = '#92400E';
+            result.style.background = '#FFFBEB';
+            result.style.borderBottomColor = '#FCD34D';
+          }
+        }
+        inputA.addEventListener('input', recalc);
+        inputB.addEventListener('input', recalc);
+        recalc();
+      }, 0);
+      return `<span id="${idResult}" style="display:inline-block;border:none;border-bottom:2px solid #FCD34D;background:#FFFBEB;color:#92400E;font-weight:700;font-size:13px;font-family:inherit;padding:0 6px 1px;border-radius:2px 2px 0 0;min-width:40px;text-align:center;">?</span>`;
+    });
     // Tokens texte : {{NOM}}
     out = out.replace(/\{\{([A-Z0-9_]+)\}\}/g, (match, token) => {
       const id = `tok-${mailId}-${varIdx}-${token}`;
@@ -1441,6 +1484,14 @@ function copyVariant(varIdx, mailId) {
   const mail = MAILS.find(m => m.id === mailId);
   if (!mail) return;
   let body = mail.variants[varIdx].body;
+  // Substituer les tokens CALC
+  body = body.replace(/\{\{CALC:([A-Z0-9_]+)\/([A-Z0-9_]+)\}\}/g, (match, tokA, tokB) => {
+    const inputA = document.getElementById(`tok-${mailId}-${varIdx}-${tokA}`);
+    const inputB = document.getElementById(`tok-${mailId}-${varIdx}-${tokB}`);
+    const a = parseFloat(String(inputA ? inputA.value : '').replace(',', '.'));
+    const b = parseFloat(String(inputB ? inputB.value : '').replace(',', '.'));
+    return (a > 0 && b > 0) ? Math.ceil(a / b).toLocaleString('fr-FR') : match;
+  });
   // Substituer les tokens YESNO
   body = body.replace(/\{\{YESNO:([A-Z0-9_]+)\}\}/g, (match, token) => {
     const selected = document.querySelector(`input[name="tok-${mailId}-${varIdx}-${token}"]:checked`);
