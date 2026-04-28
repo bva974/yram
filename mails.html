@@ -607,25 +607,6 @@ Cordialement,` },
   },
 
   {
-    id: 'vente-sans-resiliation',
-    title: 'Vente du bien — absence de résiliation',
-    tags: ['résiliation', 'vente', 'cession', 'Runeo', 'eaux', 'contrat', 'justificatif'],
-    variants: [
-      { label: 'Standard', body: `Bonjour,
-
-Nous vous rappelons que, conformément aux conditions générales du service des eaux, un contrat reste actif et facturable tant qu'aucune demande de résiliation formelle n'a été effectuée par le titulaire.
-
-Le fait d'avoir quitté ou vendu le logement ne met pas fin automatiquement au contrat. En l'absence de démarche de résiliation, celui-ci continue de produire ses effets.
-
-Vous indiquez avoir vendu le bien en {{DATE_VENTE}}. Nous vous invitons donc à nous transmettre tout justificatif permettant d'en attester (acte de vente, attestation notariale, état des lieux de sortie, relevé de compteur à la date de cession, etc.).
-
-À défaut de réception de ces éléments, les consommations restent à votre charge et la dette demeure due.
-
-Cordialement,` },
-    ]
-  },
-
-  {
     id: 'impayes-avant-resiliation',
     title: 'Impayés antérieurs à la résiliation',
     tags: ['résiliation', 'impayés', 'téléphonie', 'antérieur'],
@@ -892,6 +873,21 @@ Le client mentionné en objet nous informe que le risque a disparu à la suite d
 Vous trouverez en pièce jointe le justificatif de vente.
 
 La dette est-elle bien exigible ?
+
+Cordialement,` },
+    ]
+  },
+
+  {
+    id: 'ccas-aide-percue',
+    title: 'Vérification aide CCAS',
+    tags: ['CCAS', 'aide', 'sociale', 'client', 'vérification'],
+    variants: [
+      { label: 'Standard', body: `Bonjour,
+
+Dans le cadre du suivi du dossier, pourriez-vous nous confirmer si une aide du CCAS d'un montant de {{MONTANT}} € a été perçue au titre de ce dossier ?
+
+Dans l'attente de votre retour,
 
 Cordialement,` },
     ]
@@ -1354,30 +1350,24 @@ function openMail(id) {
 }
 
 function escHtml(s, varIdx, mailId) {
-  let escaped = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  let out = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  // Remplacer les tokens {{NOM}} par des champs de saisie inline
-  escaped = escaped.replace(/\{\{([A-Z_]+)\}\}/g, (match, token) => {
-    const key = `var-${mailId}-${varIdx}-${token}`;
-    return `<input type="text" class="token-input" data-token="${token}" id="${key}" placeholder="${token.replace(/_/g,' ')}" oninput="updateTokenPreview('${mailId}',${varIdx},'${token}',this.value)" style="display:inline-block;border:none;border-bottom:2px solid var(--red);background:#FFF0F3;color:#D4003F;font-weight:700;font-size:13px;font-family:inherit;padding:0 4px;min-width:100px;outline:none;border-radius:2px 2px 0 0;" />`;
-  });
-  return escaped;
-}
-
-function updateTokenPreview(mailId, varIdx, token, value) {
-  // Met à jour tous les inputs du même token dans la même variante
-  // (utile si le token apparaît plusieurs fois)
-  const inputs = document.querySelectorAll(`input[id^="var-${mailId}-${varIdx}-${token}"]`);
-  inputs.forEach(input => { if (input.value !== value) input.value = value; });
+  if (varIdx !== undefined && mailId !== undefined) {
+    out = out.replace(/\{\{([A-Z0-9_]+)\}\}/g, (match, token) => {
+      const id = `tok-${mailId}-${varIdx}-${token}`;
+      const label = token.replace(/_/g, ' ');
+      return `<input type="text" id="${id}" class="token-input" data-token="${token}" placeholder="${label}" style="display:inline-block;border:none;border-bottom:2px solid var(--red);background:#FFF0F3;color:var(--red);font-weight:700;font-size:13px;font-family:inherit;padding:0 4px 1px;min-width:80px;outline:none;border-radius:2px 2px 0 0;" />`;
+    });
+  }
+  return out;
 }
 
 function copyVariant(varIdx, mailId) {
   const mail = MAILS.find(m => m.id === mailId);
   if (!mail) return;
   let body = mail.variants[varIdx].body;
-  // Substituer les tokens par les valeurs saisies
-  body = body.replace(/\{\{([A-Z_]+)\}\}/g, (match, token) => {
-    const input = document.getElementById(`var-${mailId}-${varIdx}-${token}`);
+  body = body.replace(/\{\{([A-Z0-9_]+)\}\}/g, (match, token) => {
+    const input = document.getElementById(`tok-${mailId}-${varIdx}-${token}`);
     return (input && input.value.trim()) ? input.value.trim() : match;
   });
   navigator.clipboard.writeText(body).then(() => {
