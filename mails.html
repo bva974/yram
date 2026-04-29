@@ -1484,6 +1484,7 @@ function openMail(id) {
   if (!mail) return;
   buildSidebar(document.getElementById('search').value);
 
+  const calcCallbacks = [];
   const variantsHtml = mail.variants.map((v, i) => `
     <div class="variant-card">
       <div class="variant-header">
@@ -1497,7 +1498,7 @@ function openMail(id) {
           Copier
         </button>
       </div>
-      <div class="variant-body">${escHtml(v.body, i, id)}</div>
+      <div class="variant-body">${escHtml(v.body, i, id, calcCallbacks)}</div>
     </div>
   `).join('');
 
@@ -1518,11 +1519,38 @@ function openMail(id) {
       <div class="variants">${variantsHtml}</div>
     </div>
   `;
+  // Attacher les calculs APRÈS insertion dans le DOM
+  calcCallbacks.forEach(({ idA, idB, idResult }) => {
+    const inputA = document.getElementById(idA);
+    const inputB = document.getElementById(idB);
+    const result = document.getElementById(idResult);
+    if (!inputA || !inputB || !result) return;
+    function doCalc() {
+      const a = parseFloat(inputA.value.replace(',', '.'));
+      const b = parseFloat(inputB.value.replace(',', '.'));
+      if (a > 0 && b > 0) {
+        result.textContent = Math.ceil(a / b).toLocaleString('fr-FR');
+        result.style.color = '#065F46';
+        result.style.background = '#ECFDF5';
+        result.style.borderBottomColor = '#6EE7B7';
+      } else {
+        result.textContent = '?';
+        result.style.color = '#92400E';
+        result.style.background = '#FFFBEB';
+        result.style.borderBottomColor = '#FCD34D';
+      }
+    }
+    inputA.addEventListener('input', doCalc);
+    inputB.addEventListener('input', doCalc);
+    doCalc();
+  });
 }
 
-function escHtml(s, varIdx, mailId) {
+function escHtml(s, varIdx, mailId, _calcCallbacks) {
   let out = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Pré-conversion des tokens CALC pour les protéger du replace {{}} suivant
+  out = out.replace(/\{\{CALC:([A-Z0-9_]+)\/([A-Z0-9_]+)\}\}/g, '[[CALC:$1/$2]]');
   if (varIdx !== undefined && mailId !== undefined) {
     // Tokens OUI/NON : {{YESNO:NOM}}
     out = out.replace(/\{\{YESNO:([A-Z0-9_]+)\}\}/g, (match, token) => {
@@ -1535,42 +1563,21 @@ function escHtml(s, varIdx, mailId) {
         `<input type="radio" id="${idY}" name="tok-${mailId}-${varIdx}-${token}" value="OUI" style="accent-color:var(--red);" /> OUI</label>` +
         `</span>`;
     });
-    // Tokens CALC : {{CALC:TOKEN_A/TOKEN_B}} — calcul dynamique A/B arrondi au supérieur
-    out = out.replace(/\{\{CALC:([A-Z0-9_]+)\/([A-Z0-9_]+)\}\}/g, (match, tokA, tokB) => {
-      const idA = `tok-${mailId}-${varIdx}-${tokA}`;
-      const idB = `tok-${mailId}-${varIdx}-${tokB}`;
-      const idResult = `calc-${mailId}-${varIdx}-${tokA}_${tokB}`;
-      setTimeout(() => {
-        const inputA = document.getElementById(idA);
-        const inputB = document.getElementById(idB);
-        const result = document.getElementById(idResult);
-        if (!inputA || !inputB || !result) return;
-        function recalc() {
-          const a = parseFloat(String(inputA.value).replace(',', '.'));
-          const b = parseFloat(String(inputB.value).replace(',', '.'));
-          if (a > 0 && b > 0) {
-            result.textContent = Math.ceil(a / b).toLocaleString('fr-FR');
-            result.style.color = '#065F46';
-            result.style.background = '#ECFDF5';
-            result.style.borderBottomColor = '#6EE7B7';
-          } else {
-            result.textContent = '?';
-            result.style.color = '#92400E';
-            result.style.background = '#FFFBEB';
-            result.style.borderBottomColor = '#FCD34D';
-          }
-        }
-        inputA.addEventListener('input', recalc);
-        inputB.addEventListener('input', recalc);
-        recalc();
-      }, 0);
-      return `<span id="${idResult}" style="display:inline-block;border:none;border-bottom:2px solid #FCD34D;background:#FFFBEB;color:#92400E;font-weight:700;font-size:13px;font-family:inherit;padding:0 6px 1px;border-radius:2px 2px 0 0;min-width:40px;text-align:center;">?</span>`;
-    });
-    // Tokens texte : {{NOM}}
+    // Tokens texte : {{NOM}} — traités EN PREMIER pour que leurs IDs existent avant CALC
     out = out.replace(/\{\{([A-Z0-9_]+)\}\}/g, (match, token) => {
       const id = `tok-${mailId}-${varIdx}-${token}`;
       const label = token.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
       return `<input type="text" id="${id}" class="token-input" data-token="${token}" placeholder="${label}" style="display:inline-block;border:none;border-bottom:2px solid var(--red);background:#FFF0F3;color:var(--red);font-weight:700;font-size:13px;font-family:inherit;padding:0 4px 1px;min-width:80px;outline:none;border-radius:2px 2px 0 0;" />`;
+    });
+    // Tokens CALC : [[CALC:TOKEN_A/TOKEN_B]] — traités APRÈS les tokens texte
+    out = out.replace(/\[\[CALC:([A-Z0-9_]+)\/([A-Z0-9_]+)\]\]/g, (match, tokA, tokB) => {
+      const idA = `tok-${mailId}-${varIdx}-${tokA}`;
+      const idB = `tok-${mailId}-${varIdx}-${tokB}`;
+      const idResult = `calc-${mailId}-${varIdx}-${tokA}_${tokB}`;
+      if (_calcCallbacks) {
+        _calcCallbacks.push({ idA, idB, idResult });
+      }
+      return `<span id="${idResult}" style="display:inline-block;border:none;border-bottom:2px solid #FCD34D;background:#FFFBEB;color:#92400E;font-weight:700;font-size:13px;font-family:inherit;padding:0 6px 1px;border-radius:2px 2px 0 0;min-width:40px;text-align:center;">?</span>`;
     });
   }
   return out;
@@ -1582,11 +1589,8 @@ function copyVariant(varIdx, mailId) {
   let body = mail.variants[varIdx].body;
   // Substituer les tokens CALC
   body = body.replace(/\{\{CALC:([A-Z0-9_]+)\/([A-Z0-9_]+)\}\}/g, (match, tokA, tokB) => {
-    const inputA = document.getElementById(`tok-${mailId}-${varIdx}-${tokA}`);
-    const inputB = document.getElementById(`tok-${mailId}-${varIdx}-${tokB}`);
-    const a = parseFloat(String(inputA ? inputA.value : '').replace(',', '.'));
-    const b = parseFloat(String(inputB ? inputB.value : '').replace(',', '.'));
-    return (a > 0 && b > 0) ? Math.ceil(a / b).toLocaleString('fr-FR') : match;
+    const result = document.getElementById(`calc-${mailId}-${varIdx}-${tokA}_${tokB}`);
+    return (result && result.textContent !== '?') ? result.textContent : match;
   });
   // Substituer les tokens YESNO
   body = body.replace(/\{\{YESNO:([A-Z0-9_]+)\}\}/g, (match, token) => {
