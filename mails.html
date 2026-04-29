@@ -95,11 +95,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F4F8;color:var(--text
       <svg style="position:absolute;left:1.35rem;top:50%;transform:translateY(-50%);pointer-events:none;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="search" placeholder="Rechercher un mail..." oninput="filterMails()" style="width:100%;border:1.5px solid #E2E8F0;border-radius:8px;padding:8px 12px 8px 34px;font-size:12px;outline:none;transition:all .15s;background:#F9FAFB;color:#1A1A2E;" onfocus="this.style.borderColor='#D4003F';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(212,0,63,.07)'" onblur="this.style.borderColor='#E2E8F0';this.style.background='#F9FAFB';this.style.boxShadow='none'">
     </div>
-    <div style="display:flex;border-bottom:1px solid var(--border);background:#fff;position:sticky;top:49px;z-index:9;">
-      <button id="filter-all" onclick="setFilter('all')" style="flex:1;padding:7px 4px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border:none;cursor:pointer;border-bottom:2px solid #D4003F;color:#D4003F;background:#fff;transition:all .15s;">Tous</button>
-      <button id="filter-debiteur" onclick="setFilter('debiteur')" style="flex:1;padding:7px 4px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:none;cursor:pointer;border-bottom:2px solid transparent;color:#6B7280;background:#fff;transition:all .15s;">Débiteur</button>
-      <button id="filter-creancier" onclick="setFilter('creancier')" style="flex:1;padding:7px 4px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:none;cursor:pointer;border-bottom:2px solid transparent;color:#6B7280;background:#fff;transition:all .15s;">Créancier</button>
-    </div>
     <div id="sidebar-content"></div>
   </div>
   <div class="main" id="main">
@@ -1407,7 +1402,7 @@ const RED = '#D4003F';
 
 function setFilter(f) {
   activeFilter = f;
-  ['all', 'debiteur', 'creancier'].forEach(k => {
+  ['all', 'debiteur', 'creancier', 'generaliste'].forEach(k => {
     const btn = document.getElementById('filter-' + k);
     if (!btn) return;
     btn.style.borderBottom = k === f ? `2px solid ${RED}` : '2px solid transparent';
@@ -1417,13 +1412,18 @@ function setFilter(f) {
   buildSidebar(document.getElementById('search').value);
 }
 
+const CAT_CONFIG = {
+  debiteur:    { label: 'Pour débiteur',  color: '#1E40AF', bg: '#EFF6FF', border: '#BFDBFE' },
+  creancier:   { label: 'Pour créancier', color: '#065F46', bg: '#ECFDF5', border: '#6EE7B7' },
+  generaliste: { label: 'Généraliste',    color: '#92400E', bg: '#FFFBEB', border: '#FCD34D' },
+};
+
 function buildSidebar(filter) {
   const container = document.getElementById('sidebar-content');
   container.innerHTML = '';
   const words = filter ? filter.toLowerCase().trim().split(/\s+/).filter(Boolean) : [];
 
   const filtered = MAILS.filter(m => {
-    if (activeFilter !== 'all' && m.cat !== activeFilter) return false;
     if (!words.length) return true;
     const haystack = [m.title, ...m.tags, ...m.variants.map(v => v.body)].join(' ').toLowerCase();
     return words.every(w => haystack.includes(w));
@@ -1434,27 +1434,47 @@ function buildSidebar(filter) {
     return;
   }
 
+  const catOrder = ['debiteur', 'creancier', 'generaliste'];
+  const groups = {};
+  catOrder.forEach(c => groups[c] = []);
   filtered.forEach(m => {
-    const item = document.createElement('div');
-    item.className = 'mail-item' + (m.id === currentId ? ' active' : '');
-    if (m.id === currentId) {
-      item.style.borderLeftColor = RED;
-      item.style.background = '#FFF0F3';
-    }
-    item.dataset.id = m.id;
+    const c = m.cat && groups[m.cat] !== undefined ? m.cat : 'generaliste';
+    groups[c].push(m);
+  });
 
-    let title = m.title;
-    words.forEach(w => {
-      const re = new RegExp('(' + w.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&') + ')', 'gi');
-      title = title.replace(re, '<mark style="background:#FFF0A0;border-radius:2px;padding:0 1px;">$1</mark>');
+  catOrder.forEach(cat => {
+    const mails = groups[cat];
+    if (!mails.length) return;
+    const cfg = CAT_CONFIG[cat];
+
+    // Section header
+    const header = document.createElement('div');
+    header.style.cssText = `padding:6px 12px 4px;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:${cfg.color};background:${cfg.bg};border-top:1px solid ${cfg.border};border-bottom:1px solid ${cfg.border};display:flex;align-items:center;gap:6px;margin-top:2px;`;
+    header.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:${cfg.color};flex-shrink:0;display:inline-block;"></span>${cfg.label}<span style="margin-left:auto;font-size:9px;background:rgba(0,0,0,.06);border-radius:8px;padding:1px 6px;">${mails.length}</span>`;
+    container.appendChild(header);
+
+    mails.forEach(m => {
+      const item = document.createElement('div');
+      item.className = 'mail-item' + (m.id === currentId ? ' active' : '');
+      if (m.id === currentId) {
+        item.style.borderLeftColor = RED;
+        item.style.background = '#FFF0F3';
+      }
+      item.dataset.id = m.id;
+
+      let title = m.title;
+      words.forEach(w => {
+        const re = new RegExp('(' + w.replace(/[.*+?^${}()|\[\]\\]/g, '\\$&') + ')', 'gi');
+        title = title.replace(re, '<mark style="background:#FFF0A0;border-radius:2px;padding:0 1px;">$1</mark>');
+      });
+
+      item.innerHTML = `<span style="flex:1;min-width:0;">${title}</span>${m.variants.length > 1 ? `<span class="badge" style="background:#FFF0F3;color:${RED}">${m.variants.length}</span>` : ''}`;
+      item.style.display = 'flex';
+      item.style.alignItems = 'center';
+      item.style.gap = '6px';
+      item.onclick = () => openMail(m.id);
+      container.appendChild(item);
     });
-
-    item.innerHTML = `<span style="flex:1;min-width:0;">${title}</span>${m.variants.length > 1 ? `<span class="badge" style="background:#FFF0F3;color:${RED}">${m.variants.length}</span>` : ''}`;
-    item.style.display = 'flex';
-    item.style.alignItems = 'center';
-    item.style.gap = '6px';
-    item.onclick = () => openMail(m.id);
-    container.appendChild(item);
   });
 }
 
@@ -1462,8 +1482,7 @@ function openMail(id) {
   currentId = id;
   const mail = MAILS.find(m => m.id === id);
   if (!mail) return;
-  if (mail.cat && mail.cat !== activeFilter) setFilter(mail.cat);
-  else buildSidebar(document.getElementById('search').value);
+  buildSidebar(document.getElementById('search').value);
 
   const variantsHtml = mail.variants.map((v, i) => `
     <div class="variant-card">
@@ -1482,9 +1501,15 @@ function openMail(id) {
     </div>
   `).join('');
 
+  const cat = CAT_CONFIG[mail.cat];
+  const catBadgeHeader = cat
+    ? `<span class="mail-cat-badge" style="background:${cat.bg};color:${cat.color};border:1px solid ${cat.border};">${cat.label}</span>`
+    : '';
+
   document.getElementById('main').innerHTML = `
     <div class="mail-view">
       <div class="mail-header">
+        ${catBadgeHeader}
         <div class="mail-title">${mail.title}</div>
         <div class="mail-meta">
           ${mail.tags.map(t => `<span class="mail-tag">${t}</span>`).join('')}
