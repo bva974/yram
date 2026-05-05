@@ -379,9 +379,7 @@ function generate() {
 
   var rem = base;
   var n   = premier > 0 ? 2 : 1;
-  var d   = premier > 0
-    ? new Date(startDate.getFullYear(), startDate.getMonth()+1, startDate.getDate())
-    : new Date(startDate);
+  var d   = new Date(startDate);
 
   while (rem > 0.005 && n <= 241) {
     var m = rem <= mensual ? rem : mensual;
