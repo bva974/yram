@@ -118,7 +118,7 @@ tr.total-row td{background:#D1FAE5;font-weight:700;color:#065F46;border-top:2px 
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="#1E40AF" stroke-width="1.5"/><path d="M8 5v1.5M8 9.5V11M6.5 7.25C6.5 6.56 7.17 6 8 6s1.5.56 1.5 1.25c0 .83-.75 1.25-1.5 1.5v.75" stroke="#1E40AF" stroke-width="1.2" stroke-linecap="round"/></svg>
           Créance
         </div>
-        <div class="params-block-body">
+        <div class="params-block-body" style="grid-template-columns:1fr 1fr;">
           <div class="field">
             <div class="field-lbl"><span>Montant total dû (€)</span></div>
             <input id="montant" type="number" step="0.01" min="0" placeholder="ex : 1 200,00" class="big" oninput="generate()">
@@ -128,6 +128,11 @@ tr.total-row td{background:#D1FAE5;font-weight:700;color:#065F46;border-top:2px 
             <div class="field-lbl"><span>Premier paiement (€)</span><small>— optionnel</small></div>
             <input id="premier" type="number" step="0.01" min="0" placeholder="ex : 200,00" oninput="generate()">
             <div class="hint" id="hint-solde"></div>
+          </div>
+          <div class="field" id="field-date-premier" style="display:none;grid-column:1/-1">
+            <div class="field-lbl"><span>Date du 1er paiement</span><small>— si différente de la 1ère échéance</small></div>
+            <input id="date-premier" type="date" oninput="generate()">
+            <div class="hint"></div>
           </div>
         </div>
       </div>
@@ -166,10 +171,11 @@ tr.total-row td{background:#D1FAE5;font-weight:700;color:#065F46;border-top:2px 
       <div class="params-block-body single" style="border-radius:0 0 7px 7px;">
         <div class="mode-sep">
           <div class="toggle-row">
-            <button class="tbtn on" id="btn-mens" onclick="setMode('mens')">Montant de la mensualité</button>
-            <button class="tbtn"    id="btn-nb"   onclick="setMode('nb')">Nombre d'échéances</button>
+            <button class="tbtn on" id="btn-mens"  onclick="setMode('mens')">Mensualité</button>
+            <button class="tbtn"    id="btn-nb"    onclick="setMode('nb')">Nb d'échéances</button>
+            <button class="tbtn"    id="btn-solde" onclick="setMode('solde')">Solde à date fixe</button>
           </div>
-          <div class="inputs-row">
+          <div class="inputs-row" id="block-classic">
             <div class="field" id="block-mens">
               <div class="field-lbl"><span>Mensualité (€)</span></div>
               <input id="mensualite" type="number" step="1" min="1" placeholder="ex : 100" oninput="generate()">
@@ -179,6 +185,19 @@ tr.total-row td{background:#D1FAE5;font-weight:700;color:#065F46;border-top:2px 
               <div class="field-lbl"><span>Nombre d'échéances</span></div>
               <input id="nb" type="number" step="1" min="1" max="240" placeholder="ex : 6" disabled oninput="generate()">
               <div class="hint" id="hint-nb"></div>
+            </div>
+          </div>
+          <!-- Champs mode solde à date fixe -->
+          <div class="inputs-row" id="block-solde" style="display:none">
+            <div class="field">
+              <div class="field-lbl"><span>Mensualité intermédiaire (€)</span></div>
+              <input id="mens-solde" type="number" step="0.01" min="0" placeholder="ex : 40" disabled oninput="generate()">
+              <div class="hint" id="hint-mens-solde"></div>
+            </div>
+            <div class="field">
+              <div class="field-lbl"><span>Date du solde final</span></div>
+              <input id="date-solde" type="date" disabled oninput="generate()">
+              <div class="hint" id="hint-date-solde"></div>
             </div>
           </div>
         </div>
@@ -210,14 +229,25 @@ var currentMode = 'mens';
 
 function setMode(m) {
   currentMode = m;
-  document.getElementById('btn-mens').className = m==='mens' ? 'tbtn on' : 'tbtn';
-  document.getElementById('btn-nb').className   = m==='nb'   ? 'tbtn on' : 'tbtn';
+  document.getElementById('btn-mens').className  = m==='mens'  ? 'tbtn on' : 'tbtn';
+  document.getElementById('btn-nb').className    = m==='nb'    ? 'tbtn on' : 'tbtn';
+  document.getElementById('btn-solde').className = m==='solde' ? 'tbtn on' : 'tbtn';
+  // Affichage des blocs
+  document.getElementById('block-classic').style.display = m==='solde' ? 'none' : '';
+  document.getElementById('block-solde').style.display   = m==='solde' ? 'grid' : 'none';
+  // Activation des inputs
+  document.getElementById('mensualite').disabled  = m !== 'mens';
+  document.getElementById('nb').disabled          = m !== 'nb';
+  document.getElementById('mens-solde').disabled  = m !== 'solde';
+  document.getElementById('date-solde').disabled  = m !== 'solde';
+  // Bloc CSS actif/inactif classique
   document.getElementById('block-mens').className = m==='mens' ? 'field' : 'field inactive';
   document.getElementById('block-nb').className   = m==='nb'   ? 'field' : 'field inactive';
-  document.getElementById('mensualite').disabled = m !== 'mens';
-  document.getElementById('nb').disabled         = m !== 'nb';
+  // Réinitialiser les hints
   document.getElementById('hint-mens').textContent = '';
   document.getElementById('hint-nb').textContent   = '';
+  document.getElementById('hint-mens-solde').textContent = '';
+  document.getElementById('hint-date-solde').textContent = '';
   generate();
 }
 
@@ -244,10 +274,88 @@ function generate() {
   var premier = (premierRaw > 0 && premierRaw < montant) ? Math.round(premierRaw * 100) / 100 : 0;
   var solde   = Math.round((montant - premier) * 100) / 100;
 
-  document.getElementById('hint-solde').textContent = premier > 0
-    ? '→ Solde : ' + fmt(solde)
-    : '';
+  // Afficher/masquer le champ date du premier paiement
+  var fieldDatePremier = document.getElementById('field-date-premier');
+  fieldDatePremier.style.display = premier > 0 ? '' : 'none';
 
+  var datePremierVal = document.getElementById('date-premier').value;
+  var datePremierDate = (premier > 0 && datePremierVal) ? new Date(datePremierVal) : new Date(startVal);
+
+  document.getElementById('hint-solde').textContent = premier > 0 ? '→ Solde : ' + fmt(solde) : '';
+
+  var rows = [];
+  var startDate = new Date(startVal);
+
+  // ── MODE SOLDE À DATE FIXE ────────────────────────────────────────────────
+  if (currentMode === 'solde') {
+    var mensSoldeRaw = parseFloat(document.getElementById('mens-solde').value);
+    var dateSoldeVal = document.getElementById('date-solde').value;
+    if (!mensSoldeRaw || mensSoldeRaw <= 0 || !dateSoldeVal) { clear(); return; }
+
+    var mensSolde = Math.round(mensSoldeRaw * 100) / 100;
+    var dateSolde = new Date(dateSoldeVal);
+    var n = 1;
+    var baseDebt = montant;
+
+    // Insérer le premier versement si renseigné
+    if (premier > 0) {
+      rows.push({ n:1, date:new Date(datePremierDate), montant:premier, mode:mode, isPremier:true });
+      baseDebt = solde;
+      n++;
+    }
+
+    // Générer les mensualités intermédiaires jusqu'au mois précédant la date de solde
+    var d = new Date(startDate);
+    var cumul = 0;
+    while (true) {
+      var nextD = new Date(d.getFullYear(), d.getMonth()+1, d.getDate());
+      if (nextD >= dateSolde) break;
+      rows.push({ n:n, date:new Date(d), montant:mensSolde, mode:mode });
+      cumul = Math.round((cumul + mensSolde) * 100) / 100;
+      d = nextD;
+      n++;
+      if (n > 120) break;
+    }
+
+    // Dernière ligne : solde final à la date fixée
+    var soldeFinal = Math.round((baseDebt - cumul) * 100) / 100;
+    rows.push({ n:n, date:new Date(dateSolde), montant:soldeFinal, mode:mode, isSolde:true });
+
+    var nbMens = rows.filter(function(r){ return !r.isPremier && !r.isSolde; }).length;
+    document.getElementById('hint-mens-solde').textContent = '→ ' + nbMens + ' mensualité' + (nbMens>1?'s':'') + ' de ' + fmt(mensSolde);
+    document.getElementById('hint-date-solde').textContent = '→ Solde : ' + fmt(soldeFinal);
+
+    var last = rows[rows.length-1];
+    document.getElementById('s-total').textContent = fmt(montant);
+    document.getElementById('s-nb').textContent    = rows.length;
+    document.getElementById('s-fin').textContent   = fmtD(last.date);
+    document.getElementById('summary').style.display = 'grid';
+
+    var trs = rows.map(function(r) {
+      var rowStyle = r.isPremier ? ' style="background:#EEF9F0"' : (r.isSolde ? ' style="background:#FEE2E8"' : '');
+      var badge = r.isPremier
+        ? ' <span style="font-size:9px;background:#16A34A;color:#fff;border-radius:3px;padding:1px 5px;font-weight:700;vertical-align:middle">1er versement</span>'
+        : (r.isSolde
+          ? ' <span style="font-size:9px;background:#D4003F;color:#fff;border-radius:3px;padding:1px 5px;font-weight:700;vertical-align:middle">SOLDE</span>'
+          : '');
+      var amtStyle = r.isSolde ? ' style="color:#D4003F;font-weight:700"' : '';
+      return '<tr'+rowStyle+'><td class="n-cell">'+r.n+'</td><td>'+fmtD(r.date)+'</td>'+
+        '<td'+amtStyle+'>'+fmt(r.montant)+badge+'</td>'+
+        '<td style="color:var(--muted)">'+r.mode+'</td></tr>';
+    }).join('');
+
+    var html = '<table>'+
+      '<thead><tr><th>N°</th><th>Date d\'échéance</th><th>Montant</th><th>Mode de paiement</th></tr></thead>'+
+      '<tbody>'+trs+
+      '<tr class="total-row"><td></td><td>TOTAL DÛ</td><td style="color:var(--red)">'+fmt(montant)+'</td><td></td></tr>'+
+      '</tbody></table>';
+    html += '<p class="note" style="color:#D4003F">Solde intégral du restant dû le '+fmtD(dateSolde)+'.</p>';
+    if (premier > 0) html += '<p class="note" style="color:#16A34A">Premier versement de '+fmt(premier)+' déduit — mensualités calculées sur le solde de '+fmt(solde)+'.</p>';
+    document.getElementById('table-container').innerHTML = html;
+    return;
+  }
+
+  // ── MODES CLASSIQUES (mens / nb) ─────────────────────────────────────────
   var base = premier > 0 ? solde : montant;
 
   var mensual;
@@ -265,11 +373,8 @@ function generate() {
     document.getElementById('hint-mens').textContent = '';
   }
 
-  var rows = [];
-  var startDate = new Date(startVal);
-
   if (premier > 0) {
-    rows.push({ n:1, date:new Date(startDate), montant:premier, mode:mode, isPremier:true });
+    rows.push({ n:1, date:new Date(datePremierDate), montant:premier, mode:mode, isPremier:true });
   }
 
   var rem = base;
