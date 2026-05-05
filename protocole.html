@@ -227,9 +227,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F2F5;color:var(--text
             <option>Prélèvement CB</option>
           </select>
         </div>
-        <div style="display:flex;gap:6px;margin-top:2px;">
+        <div style="display:flex;gap:6px;margin-top:2px;flex-wrap:wrap;">
           <button class="toggle-btn active" id="btn-mode-mens" onclick="setEchMode('mens')">Par mensualité</button>
           <button class="toggle-btn" id="btn-mode-nb" onclick="setEchMode('nb')">Par nb d'échéances</button>
+          <button class="toggle-btn" id="btn-mode-solde" onclick="setEchMode('solde')">Solde à date fixe</button>
         </div>
         <div class="field" id="field-mens">
           <label>Mensualité (€)</label>
@@ -240,6 +241,17 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F2F5;color:var(--text
           <label>Nombre d'échéances</label>
           <input id="nb-echeances" type="number" step="1" min="1" max="240" placeholder="ex: 6" disabled oninput="render()">
           <span id="hint-nb" style="font-size:11px;color:#185FA5;font-weight:600;min-height:16px;"></span>
+        </div>
+        <div id="field-solde-wrap" style="display:none;flex-direction:column;gap:4px;">
+          <div class="field">
+            <label>Mensualité intermédiaire (€)</label>
+            <input id="mens-solde" type="number" step="0.01" min="0" placeholder="ex: 40" disabled oninput="render()">
+          </div>
+          <div class="field">
+            <label>Date de solde (dernier versement)</label>
+            <input id="date-solde" type="date" disabled oninput="render()">
+          </div>
+          <span id="hint-solde-mode" style="font-size:11px;color:#185FA5;font-weight:600;min-height:16px;"></span>
         </div>
       </div>
     </div>
@@ -307,15 +319,19 @@ let echMode = 'mens';
 
 function setEchMode(mode) {
   echMode = mode;
-  const isMens = mode === 'mens';
-  document.getElementById('btn-mode-mens').className = isMens ? 'toggle-btn active' : 'toggle-btn';
-  document.getElementById('btn-mode-nb').className   = !isMens ? 'toggle-btn active' : 'toggle-btn';
-  document.getElementById('field-mens').style.display = isMens ? '' : 'none';
-  document.getElementById('field-nb').style.display   = isMens ? 'none' : '';
-  document.getElementById('mensualite').disabled = !isMens;
-  document.getElementById('nb-echeances').disabled = isMens;
-  document.getElementById('hint-mens').textContent = '';
-  document.getElementById('hint-nb').textContent = '';
+  document.getElementById('btn-mode-mens').className  = mode==='mens'  ? 'toggle-btn active' : 'toggle-btn';
+  document.getElementById('btn-mode-nb').className    = mode==='nb'    ? 'toggle-btn active' : 'toggle-btn';
+  document.getElementById('btn-mode-solde').className = mode==='solde' ? 'toggle-btn active' : 'toggle-btn';
+  document.getElementById('field-mens').style.display       = mode==='mens'  ? '' : 'none';
+  document.getElementById('field-nb').style.display         = mode==='nb'    ? '' : 'none';
+  document.getElementById('field-solde-wrap').style.display = mode==='solde' ? 'flex' : 'none';
+  document.getElementById('mensualite').disabled      = mode !== 'mens';
+  document.getElementById('nb-echeances').disabled    = mode !== 'nb';
+  document.getElementById('mens-solde').disabled      = mode !== 'solde';
+  document.getElementById('date-solde').disabled      = mode !== 'solde';
+  document.getElementById('hint-mens').textContent    = '';
+  document.getElementById('hint-nb').textContent      = '';
+  document.getElementById('hint-solde-mode').textContent = '';
   render();
 }
 
@@ -328,12 +344,17 @@ function getMensualite(montant) {
     const nb = Math.ceil(montant / m);
     document.getElementById('hint-mens').textContent = `→ ${nb} échéance${nb>1?'s':''}`;
     return m;
-  } else {
+  } else if(echMode === 'nb') {
     const nb = parseInt(document.getElementById('nb-echeances').value);
     if(!nb || nb <= 0) return null;
     const m = Math.ceil(montant / nb);
     document.getElementById('hint-nb').textContent = `→ ${m.toLocaleString('fr-FR')} € / mois`;
     return m;
+  } else {
+    // mode 'solde' — mensualité fixe jusqu'à date de solde
+    const raw = parseFloat(document.getElementById('mens-solde').value);
+    if(!raw || raw <= 0) return null;
+    return Math.ceil(raw);
   }
 }
 
@@ -412,28 +433,77 @@ function render(){
   let echHTML = '';
   const sr = document.getElementById('sum-row');
 
-  if(montant>0 && mens>0 && start){
+  if(montant>0 && (mens>0 || echMode==='solde') && start){
     let allRows = [];
     const datePremierVal = document.getElementById('date-premier').value;
     const datePremier = (premierPaiement>0 && datePremierVal) ? datePremierVal : start;
-    let firstDate = new Date(start);
-    if(premierPaiement>0){
-      allRows.push({n:1, date:new Date(datePremier), montant:premierPaiement, mode, isPremier:true});
-      const echRows = echeancier(solde, mens, start, mode);
-      echRows.forEach((r,i)=>{ r.n=i+2; allRows.push(r); });
-    } else {
-      allRows = echeancier(montant, mens, start, mode);
-    }
-    const last = allRows[allRows.length-1];
-    document.getElementById('s-mont').textContent = fmt(montant);
-    document.getElementById('s-nb').textContent   = allRows.length;
-    document.getElementById('s-fin').textContent  = last ? fmtD(last.date) : '—';
-    sr.style.display = 'grid';
 
-    const trs = allRows.map(r=>`<tr${r.isPremier?' style="background:#EEF9F0"':''}><td class="n-cell">${r.n}</td><td>${fmtD(r.date)}</td><td class="${r.adjusted?'amt-last':''}">${fmt(r.montant)}${r.isPremier?' <span style="font-size:9px;background:#16A34A;color:#fff;border-radius:3px;padding:1px 5px;vertical-align:middle;font-weight:700">1er versement</span>':''}</td><td style="color:var(--muted)">${r.mode}</td></tr>`).join('');
-    echHTML = `<table class="ech-table"><thead><tr><th>N°</th><th>Date d'échéance</th><th>Montant</th><th>Mode de paiement</th></tr></thead><tbody>${trs}<tr class="total-row"><td></td><td>TOTAL DÛ</td><td style="color:var(--red)">${fmt(montant)}</td><td></td></tr></tbody></table>`;
-    if(last && last.adjusted) echHTML += `<p class="ech-note">La dernière échéance est ajustée pour solder exactement le montant dû.</p>`;
-    if(premierPaiement>0) echHTML += `<p class="ech-note" style="color:#16A34A">Premier versement de ${fmt(premierPaiement)} déduit — échéances calculées sur le solde de ${fmt(solde)}.</p>`;
+    if(echMode === 'solde'){
+      // Mode solde à date fixe
+      const dateSoldeVal = document.getElementById('date-solde').value;
+      const mensSoldeRaw = parseFloat(document.getElementById('mens-solde').value);
+      const mensSolde = (mensSoldeRaw > 0) ? Math.round(mensSoldeRaw*100)/100 : 0;
+      if(!dateSoldeVal || !mensSolde){ sr.style.display='none'; echHTML=`<p style="font-size:12px;color:var(--muted);padding-left:13px">Renseignez la mensualité intermédiaire et la date de solde.</p>`; }
+      else {
+        const dateSolde = new Date(dateSoldeVal);
+        // Insérer le premier versement si renseigné
+        let n = 1;
+        let baseDebt = montant;
+        if(premierPaiement > 0){
+          const datePremierVal = document.getElementById('date-premier').value;
+          const datePremier = datePremierVal ? datePremierVal : start;
+          allRows.push({n, date:new Date(datePremier), montant:premierPaiement, mode, isPremier:true});
+          baseDebt = solde; // on travaille sur le solde après premier versement
+          n++;
+        }
+        // Générer les mensualités mensuelles de start jusqu'au mois avant dateSolde
+        let d = new Date(start);
+        let cumul = 0;
+        while(true){
+          const nextD = new Date(d.getFullYear(), d.getMonth()+1, d.getDate());
+          if(nextD >= dateSolde) break;
+          allRows.push({n, date:new Date(d), montant:mensSolde, mode});
+          cumul = Math.round((cumul + mensSolde)*100)/100;
+          d = nextD;
+          n++;
+          if(n > 120) break;
+        }
+        // Ajouter la ligne de solde final à la date exacte (sur baseDebt, pas montant total)
+        const soldeFinal = Math.round((baseDebt - cumul)*100)/100;
+        allRows.push({n, date:new Date(dateSolde), montant:soldeFinal, mode, isSolde:true});
+        const hintSM = document.getElementById('hint-solde-mode');
+        const nbMens = allRows.filter(r=>!r.isPremier && !r.isSolde).length;
+        if(hintSM) hintSM.textContent = `→ ${nbMens} mensualité${nbMens>1?'s':''} de ${fmt(mensSolde)} + solde ${fmt(soldeFinal)} le ${fmtD(dateSolde)}`;
+        const last = allRows[allRows.length-1];
+        document.getElementById('s-mont').textContent = fmt(montant);
+        document.getElementById('s-nb').textContent   = allRows.length;
+        document.getElementById('s-fin').textContent  = last ? fmtD(last.date) : '—';
+        sr.style.display = 'grid';
+        const trs = allRows.map(r=>`<tr${r.isPremier?' style="background:#EEF9F0"':''}${r.isSolde?' style="background:#FEE2E8"':''}><td class="n-cell">${r.n}</td><td>${fmtD(r.date)}</td><td style="${r.isSolde?'color:#D4003F;font-weight:700':''}">${fmt(r.montant)}${r.isPremier?' <span style="font-size:9px;background:#16A34A;color:#fff;border-radius:3px;padding:1px 5px;vertical-align:middle;font-weight:700">1er versement</span>':''}${r.isSolde?' <span style="font-size:9px;background:#D4003F;color:#fff;border-radius:3px;padding:1px 5px;vertical-align:middle;font-weight:700">SOLDE</span>':''}</td><td style="color:var(--muted)">${r.mode}</td></tr>`).join('');
+        echHTML = `<table class="ech-table"><thead><tr><th>N°</th><th>Date d'échéance</th><th>Montant</th><th>Mode de paiement</th></tr></thead><tbody>${trs}<tr class="total-row"><td></td><td>TOTAL DÛ</td><td style="color:var(--red)">${fmt(montant)}</td><td></td></tr></tbody></table>`;
+        echHTML += `<p class="ech-note" style="color:#D4003F">Solde intégral du restant dû le ${fmtD(dateSolde)}.</p>`;
+        if(premierPaiement>0) echHTML += `<p class="ech-note" style="color:#16A34A">Premier versement de ${fmt(premierPaiement)} déduit — mensualités calculées sur le solde de ${fmt(solde)}.</p>`;
+      }
+    } else {
+      // Modes 'mens' et 'nb' classiques
+      if(premierPaiement>0){
+        allRows.push({n:1, date:new Date(datePremier), montant:premierPaiement, mode, isPremier:true});
+        const echRows = echeancier(solde, mens, start, mode);
+        echRows.forEach((r,i)=>{ r.n=i+2; allRows.push(r); });
+      } else {
+        allRows = echeancier(montant, mens, start, mode);
+      }
+      const last = allRows[allRows.length-1];
+      document.getElementById('s-mont').textContent = fmt(montant);
+      document.getElementById('s-nb').textContent   = allRows.length;
+      document.getElementById('s-fin').textContent  = last ? fmtD(last.date) : '—';
+      sr.style.display = 'grid';
+
+      const trs = allRows.map(r=>`<tr${r.isPremier?' style="background:#EEF9F0"':''}><td class="n-cell">${r.n}</td><td>${fmtD(r.date)}</td><td class="${r.adjusted?'amt-last':''}">${fmt(r.montant)}${r.isPremier?' <span style="font-size:9px;background:#16A34A;color:#fff;border-radius:3px;padding:1px 5px;vertical-align:middle;font-weight:700">1er versement</span>':''}</td><td style="color:var(--muted)">${r.mode}</td></tr>`).join('');
+      echHTML = `<table class="ech-table"><thead><tr><th>N°</th><th>Date d'échéance</th><th>Montant</th><th>Mode de paiement</th></tr></thead><tbody>${trs}<tr class="total-row"><td></td><td>TOTAL DÛ</td><td style="color:var(--red)">${fmt(montant)}</td><td></td></tr></tbody></table>`;
+      if(last && last.adjusted) echHTML += `<p class="ech-note">La dernière échéance est ajustée pour solder exactement le montant dû.</p>`;
+      if(premierPaiement>0) echHTML += `<p class="ech-note" style="color:#16A34A">Premier versement de ${fmt(premierPaiement)} déduit — échéances calculées sur le solde de ${fmt(solde)}.</p>`;
+    }
   } else {
     sr.style.display = 'none';
     echHTML = `<p style="font-size:12px;color:var(--muted);padding-left:13px">Renseignez le montant, la mensualité et la date de départ.</p>`;
