@@ -915,6 +915,30 @@ Pouvez-vous nous confirmer si la dette demeure due en totalité ou si un dégrè
     ]
   },
 
+    ]
+  },
+
+  {
+    id: 'facture-plombier-fuite',
+    cat: 'debiteur',
+    edited: '29/04/2026',
+    title: 'Demande de facture plombier — fuite',
+    tags: ['fuite', 'plombier', 'facture', 'dégrèvement', 'eau'],
+    variants: [
+      { label: 'Standard', body: `Bonjour Madame, Monsieur,
+
+Nous prenons note de votre message.
+
+Toutefois, afin que votre demande puisse être étudiée, vous devez impérativement nous transmettre une facture de réparation établie par un plombier, permettant de justifier l'intervention réalisée suite à la fuite.
+
+À ce jour, en l'absence de ce document, la dette reste due et la procédure suit son cours.
+
+Dès réception de la facture conforme, le créancier pourra réexaminer votre dossier et un éventuel dégrèvement pourra être appliqué selon les éléments transmis.
+
+Cordialement,` },
+    ]
+  },
+
   {
     id: 'raccordement-egout',
     cat: 'creancier',
@@ -1586,6 +1610,9 @@ function openMail(id) {
     const inputA = document.getElementById(idA);
     const inputB = document.getElementById(idB);
     const result = document.getElementById(idResult);
+    console.log('[CALC DEBUG] idA:', idA, '→', inputA ? 'OK' : 'MISSING');
+    console.log('[CALC DEBUG] idB:', idB, '→', inputB ? 'OK' : 'MISSING');
+    console.log('[CALC DEBUG] result:', idResult, '→', result ? 'OK' : 'MISSING');
     if (!inputA || !inputB || !result) return;
     function doCalc() {
       const a = parseFloat(inputA.value.replace(',', '.'));
